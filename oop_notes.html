@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OOP Reference — C++ / Python</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<style>
+:root{
+  --bg:#0d1117;
+  --bg-elevated:#151b23;
+  --panel:#11151c;
+  --border:#232b36;
+  --text:#c9d1d9;
+  --text-dim:#7d8590;
+  --text-bright:#f0f3f6;
+  --accent-cpp:#5fb3d9;
+  --accent-py:#e0b34d;
+  --accent-green:#5fd996;
+  --mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0; padding:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  line-height:1.65;
+  scroll-behavior:smooth;
+}
+::selection{ background:#264f78; color:#fff; }
+
+/* ---------- layout ---------- */
+.wrap{ display:flex; min-height:100vh; }
+
+.sidebar{
+  width:260px; flex-shrink:0;
+  background:var(--bg-elevated);
+  border-right:1px solid var(--border);
+  position:sticky; top:0; height:100vh;
+  overflow-y:auto;
+  padding:20px 0 40px;
+}
+.sidebar::-webkit-scrollbar{ width:8px; }
+.sidebar::-webkit-scrollbar-thumb{ background:#2a3340; border-radius:4px; }
+
+.brand{
+  padding:0 20px 16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:12px;
+}
+.brand .tag{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:0.12em;
+  color:var(--accent-green);
+  text-transform:uppercase;
+}
+.brand h1{
+  font-size:17px;
+  margin:6px 0 0;
+  color:var(--text-bright);
+  font-weight:700;
+  letter-spacing:-0.01em;
+}
+
+.navlist{ list-style:none; margin:0; padding:0 8px; }
+.navlist li{ margin:1px 0; }
+.navlist a{
+  display:flex; align-items:baseline; gap:8px;
+  padding:7px 12px;
+  border-radius:6px;
+  color:var(--text-dim);
+  text-decoration:none;
+  font-size:13.5px;
+  transition:background .12s, color .12s;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.navlist a .num{
+  font-family:var(--mono);
+  font-size:11px;
+  color:#4c5560;
+  flex-shrink:0;
+  width:18px;
+}
+.navlist a:hover{ background:#1c232d; color:var(--text-bright); }
+.navlist a.active{ background:#1a2530; color:var(--accent-cpp); }
+.navlist a.active .num{ color:var(--accent-cpp); }
+
+.main{
+  flex:1;
+  max-width:900px;
+  padding:48px 56px 120px;
+}
+
+/* ---------- header/intro ---------- */
+.doc-header{ margin-bottom:44px; }
+.doc-header .tag{
+  font-family:var(--mono); font-size:12px; letter-spacing:.1em;
+  color:var(--accent-green); text-transform:uppercase;
+}
+.doc-header h1{
+  font-size:34px; margin:10px 0 8px; color:var(--text-bright);
+  letter-spacing:-0.02em; font-weight:800;
+}
+.doc-header p{ color:var(--text-dim); font-size:15px; max-width:620px; }
+.pillars{
+  display:flex; gap:10px; margin-top:20px; flex-wrap:wrap;
+}
+.pillar-chip{
+  font-family:var(--mono); font-size:12px;
+  border:1px solid var(--border);
+  background:var(--bg-elevated);
+  padding:6px 12px; border-radius:20px;
+  color:var(--text-dim);
+}
+
+/* ---------- topic sections ---------- */
+.topic{
+  margin-bottom:64px;
+  scroll-margin-top:24px;
+}
+.topic-head{
+  display:flex; align-items:baseline; gap:12px;
+  margin-bottom:14px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.topic-head .idx{
+  font-family:var(--mono); color:var(--accent-cpp); font-size:15px; font-weight:600;
+}
+.topic-head h2{
+  font-size:22px; margin:0; color:var(--text-bright); font-weight:700; letter-spacing:-0.01em;
+}
+
+.theory{ font-size:15px; color:var(--text); margin-bottom:14px; }
+.theory p{ margin:0 0 12px; }
+.theory ul, .theory ol{ margin:0 0 12px; padding-left:22px; }
+.theory li{ margin-bottom:4px; }
+.theory code{
+  font-family:var(--mono); background:#1a2129; color:var(--accent-green);
+  padding:1px 6px; border-radius:4px; font-size:13px;
+}
+.theory strong{ color:var(--text-bright); }
+
+table.reftable{
+  width:100%; border-collapse:collapse; margin:14px 0 18px;
+  font-size:13.5px;
+}
+table.reftable th, table.reftable td{
+  border:1px solid var(--border); padding:8px 12px; text-align:left;
+}
+table.reftable th{
+  background:var(--bg-elevated); color:var(--text-bright); font-weight:600;
+}
+table.reftable td{ color:var(--text); }
+table.reftable code{ font-family:var(--mono); color:var(--accent-green); font-size:12.5px; }
+
+.callout{
+  border-left:3px solid var(--accent-green);
+  background:#111a15;
+  padding:10px 16px;
+  border-radius:0 6px 6px 0;
+  font-size:13.5px;
+  color:#a9d9bd;
+  margin:14px 0;
+}
+.callout strong{ color:var(--accent-green); }
+.callout.warn{ border-left-color:#e0b34d; background:#1a1610; color:#ecd08f; }
+.callout.warn strong{ color:#e0b34d; }
+
+/* ---------- code tabs ---------- */
+.codebox{
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--panel);
+  margin:14px 0;
+}
+.tabbar{
+  display:flex;
+  background:var(--bg-elevated);
+  border-bottom:1px solid var(--border);
+}
+.tabbtn{
+  font-family:var(--mono);
+  font-size:12.5px;
+  padding:9px 18px;
+  background:transparent;
+  border:none;
+  color:var(--text-dim);
+  cursor:pointer;
+  border-right:1px solid var(--border);
+  display:flex; align-items:center; gap:7px;
+  transition:background .12s,color .12s;
+}
+.tabbtn .dot{ width:8px; height:8px; border-radius:50%; }
+.tabbtn[data-lang="cpp"] .dot{ background:var(--accent-cpp); }
+.tabbtn[data-lang="python"] .dot{ background:var(--accent-py); }
+.tabbtn:hover{ color:var(--text-bright); }
+.tabbtn.active{ background:var(--panel); color:var(--text-bright); }
+.tabbtn.active[data-lang="cpp"]{ box-shadow:inset 0 -2px 0 var(--accent-cpp); }
+.tabbtn.active[data-lang="python"]{ box-shadow:inset 0 -2px 0 var(--accent-py); }
+
+.pane{ display:none; }
+.pane.active{ display:block; }
+.pane pre{
+  margin:0; padding:16px 18px;
+  overflow-x:auto;
+  font-size:13px;
+  line-height:1.6;
+}
+.pane code.hljs{ background:transparent !important; padding:0; font-family:var(--mono); }
+
+.output-block{
+  border-top:1px solid var(--border);
+  background:#0a0d12;
+  padding:10px 18px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:#6b7885;
+}
+.output-block .lbl{
+  color:#4c5560; text-transform:uppercase; letter-spacing:.08em; font-size:10px; margin-bottom:6px; display:block;
+}
+
+/* ---------- cheatsheet ---------- */
+.cheat-grid{ font-size:13.5px; }
+.cheat-grid table.reftable td:first-child{ color:var(--text-bright); font-weight:600; white-space:nowrap; }
+
+footer.docfoot{
+  border-top:1px solid var(--border);
+  margin-top:20px; padding-top:20px;
+  font-size:12px; color:#4c5560; font-family:var(--mono);
+}
+
+/* mobile toggle */
+.mobile-toggle{ display:none; }
+@media (max-width: 880px){
+  .wrap{ flex-direction:column; }
+  .sidebar{
+    width:100%; height:auto; position:relative; top:0;
+    max-height:52px; overflow:hidden; transition:max-height .25s ease;
+  }
+  .sidebar.open{ max-height:70vh; overflow-y:auto; }
+  .mobile-toggle{
+    display:flex; align-items:center; justify-content:space-between;
+    width:100%; padding:14px 20px; background:none; border:none;
+    color:var(--text-bright); font-family:var(--mono); font-size:13px; cursor:pointer;
+  }
+  .main{ padding:32px 20px 100px; max-width:100%; }
+  .doc-header h1{ font-size:26px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="sidebar" id="sidebar">
+    <button class="mobile-toggle" id="mobileToggle">☰ Contents <span id="toggleIcon">▾</span></button>
+    <div class="brand">
+      <div class="tag">Placement Reference</div>
+      <h1>OOP — C++ &amp; Python</h1>
+    </div>
+    <ul class="navlist" id="navlist">
+      <!-- populated by JS to keep in sync, but written statically for reliability -->
+      <li><a href="#t1"><span class="num">01</span>Introduction to OOP</a></li>
+      <li><a href="#t2"><span class="num">02</span>Class &amp; Object</a></li>
+      <li><a href="#t3"><span class="num">03</span>Access Specifiers</a></li>
+      <li><a href="#t4"><span class="num">04</span>Encapsulation</a></li>
+      <li><a href="#t5"><span class="num">05</span>Constructors</a></li>
+      <li><a href="#t6"><span class="num">06</span>The this Pointer</a></li>
+      <li><a href="#t7"><span class="num">07</span>Copy Constructor</a></li>
+      <li><a href="#t8"><span class="num">08</span>Shallow vs Deep Copy</a></li>
+      <li><a href="#t9"><span class="num">09</span>Destructor</a></li>
+      <li><a href="#t10"><span class="num">10</span>Inheritance</a></li>
+      <li><a href="#t11"><span class="num">11</span>Modes of Inheritance</a></li>
+      <li><a href="#t12"><span class="num">12</span>Types of Inheritance</a></li>
+      <li><a href="#t13"><span class="num">13</span>Polymorphism</a></li>
+      <li><a href="#t14"><span class="num">14</span>Function Overloading</a></li>
+      <li><a href="#t15"><span class="num">15</span>Function Overriding</a></li>
+      <li><a href="#t16"><span class="num">16</span>Virtual Functions</a></li>
+      <li><a href="#t17"><span class="num">17</span>Abstraction</a></li>
+      <li><a href="#t18"><span class="num">18</span>Abstract Class</a></li>
+      <li><a href="#t19"><span class="num">19</span>Static Keyword</a></li>
+      <li><a href="#t20"><span class="num">20</span>Cheatsheet</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="mainContent">
+    <div class="doc-header">
+      <div class="tag">Interview / Placement Notes</div>
+      <h1>Object-Oriented Programming</h1>
+      <p>Complete reference covering theory and dual-language code examples (C++ and Python) for every core OOP concept — built for quick revision before interviews.</p>
+      <div class="pillars">
+        <span class="pillar-chip">Encapsulation</span>
+        <span class="pillar-chip">Abstraction</span>
+        <span class="pillar-chip">Inheritance</span>
+        <span class="pillar-chip">Polymorphism</span>
+      </div>
+    </div>
+
+    <section class="topic" id="t1">
+  <div class="topic-head"><span class="idx">01</span><h2>Introduction to OOP</h2></div>
+  <div class="theory">
+
+<p><strong>Object-Oriented Programming</strong> is a programming paradigm built around <strong>objects</strong> rather than just functions and logic. It mirrors how we think about the real world.</p>
+<ul>
+<li>An <strong>object</strong> represents any real-world entity &mdash; a pen, a laptop, a car, a bank account.</li>
+<li>OOP is not mandatory, but makes code more <strong>organized, reusable, and maintainable</strong> &mdash; valuable at company scale.</li>
+<li>Core STL/standard-library types (<code>vector</code>, <code>string</code>, Python's <code>list</code>, <code>dict</code>) are internally built using OOP.</li>
+<li>OOP concepts are <strong>language-agnostic</strong> &mdash; the same ideas apply in C++, Java, Python; only syntax changes.</li>
+</ul>
+<table class="reftable">
+<tr><th>Pillar</th><th>One-line meaning</th></tr>
+<tr><td>Encapsulation</td><td>Bundling data + methods, restricting direct access to data</td></tr>
+<tr><td>Abstraction</td><td>Hiding implementation details, showing only essential features</td></tr>
+<tr><td>Inheritance</td><td>Acquiring properties/behavior of one class into another</td></tr>
+<tr><td>Polymorphism</td><td>One entity behaving in multiple forms</td></tr>
+</table>
+
+  </div>
+
+<div class="callout"><strong>Interview note:</strong> almost every placement interview asks OOP fundamentals &mdash; definitions, differences, and small code-tracing questions.</div>
+</section>
+
+<section class="topic" id="t2">
+  <div class="topic-head"><span class="idx">02</span><h2>Class & Object</h2></div>
+  <div class="theory">
+
+<p>A <strong>class</strong> is a blueprint for creating objects &mdash; it defines <strong>properties</strong> (data) and <strong>behavior</strong> (methods). An <strong>object</strong> is an instance of a class, occupying real memory.</p>
+<p>Without classes, storing data for 100 teachers would need 100 sets of separate variables. A class defines the structure once; you create as many objects as needed.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class Teacher {
+    public:
+        string name;
+        string department;
+        int salary;
+
+        void displayInfo() {
+            cout &lt;&lt; &quot;Name: &quot; &lt;&lt; name &lt;&lt; endl;
+            cout &lt;&lt; &quot;Department: &quot; &lt;&lt; department &lt;&lt; endl;
+            cout &lt;&lt; &quot;Salary: &quot; &lt;&lt; salary &lt;&lt; endl;
+        }
+};
+
+int main() {
+    Teacher t1;
+    t1.name = &quot;Mr. Sharma&quot;;
+    t1.department = &quot;Computer Science&quot;;
+    t1.salary = 60000;
+
+    Teacher t2;
+    t2.name = &quot;Ms. Verma&quot;;
+    t2.department = &quot;Mathematics&quot;;
+    t2.salary = 55000;
+
+    t1.displayInfo();
+    t2.displayInfo();
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Teacher:
+    def __init__(self, name, department, salary):
+        self.name = name
+        self.department = department
+        self.salary = salary
+
+    def display_info(self):
+        print(f&quot;Name: {self.name}&quot;)
+        print(f&quot;Department: {self.department}&quot;)
+        print(f&quot;Salary: {self.salary}&quot;)
+
+
+t1 = Teacher(&quot;Mr. Sharma&quot;, &quot;Computer Science&quot;, 60000)
+t2 = Teacher(&quot;Ms. Verma&quot;, &quot;Mathematics&quot;, 55000)
+
+t1.display_info()
+t2.display_info()</code></pre></div>
+</div>
+<div class="callout"><strong>Key idea:</strong> <code>Teacher</code> is the blueprint. <code>t1</code>/<code>t2</code> are objects &mdash; each with its own data, sharing the same methods. Python has no separate constructor keyword; <code>__init__</code> plays that role.</div>
+</section>
+
+<section class="topic" id="t3">
+  <div class="topic-head"><span class="idx">03</span><h2>Access Specifiers</h2></div>
+  <div class="theory">
+
+<p>Access specifiers control <strong>visibility</strong> of class members.</p>
+<table class="reftable">
+<tr><th>Specifier</th><th>Within class</th><th>Derived class</th><th>Outside class</th></tr>
+<tr><td><code>public</code></td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td></tr>
+<tr><td><code>protected</code></td><td>&#10003;</td><td>&#10003;</td><td>&#10007;</td></tr>
+<tr><td><code>private</code></td><td>&#10003;</td><td>&#10007;</td><td>&#10007;</td></tr>
+</table>
+<p>Default for <code>class</code> is <code>private</code>; default for <code>struct</code> is <code>public</code>.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Account {
+    private:
+        double balance;      // hidden
+
+    protected:
+        int accountNumber;   // accessible in derived classes
+
+    public:
+        string ownerName;    // accessible everywhere
+
+        void setBalance(double b) { balance = b; }
+        double getBalance() { return balance; }
+};
+
+int main() {
+    Account a;
+    a.ownerName = &quot;Rahul&quot;;     // OK - public
+    a.setBalance(5000);        // OK - public method
+    // a.balance = 5000;       // ERROR - private
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Account:
+    def __init__(self, owner_name):
+        self.owner_name = owner_name        # public (convention: no prefix)
+        self._account_number = None          # protected (convention: single underscore)
+        self.__balance = 0.0                 # private (name-mangled: _Account__balance)
+
+    def set_balance(self, b):
+        self.__balance = b
+
+    def get_balance(self):
+        return self.__balance
+
+
+a = Account(&quot;Rahul&quot;)
+a.owner_name = &quot;Rahul&quot;      # OK - public
+a.set_balance(5000)          # OK - public method
+# a.__balance = 5000        # Does NOT raise, but creates a NEW attribute (no true privacy)</code></pre></div>
+</div>
+<div class="callout warn"><strong>Python has no true access enforcement.</strong> <code>_name</code> (single underscore) is a convention for "protected," and <code>__name</code> (double underscore) triggers name-mangling to <code>_ClassName__name</code>, but nothing is truly private &mdash; it can still be accessed if you know the mangled name.</div>
+</section>
+
+<section class="topic" id="t4">
+  <div class="topic-head"><span class="idx">04</span><h2>Encapsulation</h2></div>
+  <div class="theory">
+
+<p><strong>Encapsulation</strong> = wrapping data and the functions that operate on it into a single unit (class), restricting direct access to some components.</p>
+<ul>
+<li>Achieved via access specifiers + public getter/setter methods.</li>
+<li>Protects data integrity &mdash; state can only change through controlled methods.</li>
+<li>Analogy: a capsule medicine &mdash; ingredients (data) are hidden inside; you interact with the capsule as a whole.</li>
+</ul>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class BankAccount {
+    private:
+        double balance;
+
+    public:
+        BankAccount(double initialBalance) { balance = initialBalance; }
+
+        void deposit(double amount) {
+            if (amount &gt; 0) balance += amount;
+        }
+
+        void withdraw(double amount) {
+            if (amount &gt; 0 &amp;&amp; amount &lt;= balance) balance -= amount;
+            else cout &lt;&lt; &quot;Invalid withdrawal amount!&quot; &lt;&lt; endl;
+        }
+
+        double getBalance() { return balance; }
+};
+
+int main() {
+    BankAccount acc(1000);
+    acc.deposit(500);
+    acc.withdraw(200);
+    cout &lt;&lt; &quot;Balance: &quot; &lt;&lt; acc.getBalance() &lt;&lt; endl;
+    // acc.balance = -99999;  // ERROR - private
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Balance: 1300</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class BankAccount:
+    def __init__(self, initial_balance):
+        self.__balance = initial_balance   # private
+
+    def deposit(self, amount):
+        if amount &gt; 0:
+            self.__balance += amount
+
+    def withdraw(self, amount):
+        if 0 &lt; amount &lt;= self.__balance:
+            self.__balance -= amount
+        else:
+            print(&quot;Invalid withdrawal amount!&quot;)
+
+    def get_balance(self):
+        return self.__balance
+
+
+acc = BankAccount(1000)
+acc.deposit(500)
+acc.withdraw(200)
+print(f&quot;Balance: {acc.get_balance()}&quot;)
+# Direct acc.__balance = -99999 would NOT touch the real balance
+# (it creates a new unrelated attribute due to name mangling)</code></pre><div class="output-block"><span class="lbl">Output</span>Balance: 1300</div></div>
+</div>
+<div class="callout">Without encapsulation, external code could directly corrupt state (e.g. set a negative balance). Encapsulation forces all changes through validated methods.</div>
+</section>
+
+<section class="topic" id="t5">
+  <div class="topic-head"><span class="idx">05</span><h2>Constructors</h2></div>
+  <div class="theory">
+
+<p>A <strong>constructor</strong> is a special member function automatically called when an object is created, used to initialize data members.</p>
+<ul>
+<li>Same name as the class (C++); no return type at all.</li>
+<li>Automatically invoked at object creation.</li>
+<li>Can be overloaded in C++ (multiple constructors, different parameters).</li>
+</ul>
+<table class="reftable">
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td>Default Constructor</td><td>Takes no parameters; compiler provides one if none defined</td></tr>
+<tr><td>Parameterized Constructor</td><td>Takes arguments to initialize members with specific values</td></tr>
+<tr><td>Copy Constructor</td><td>Initializes an object using another object of the same class</td></tr>
+</table>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Student {
+    public:
+        string name;
+        int age;
+
+        // Default constructor
+        Student() {
+            name = &quot;Unknown&quot;;
+            age = 0;
+            cout &lt;&lt; &quot;Default constructor called&quot; &lt;&lt; endl;
+        }
+
+        // Parameterized constructor
+        Student(string n, int a) {
+            name = n;
+            age = a;
+            cout &lt;&lt; &quot;Parameterized constructor called&quot; &lt;&lt; endl;
+        }
+};
+
+int main() {
+    Student s1;                  // default constructor
+    Student s2(&quot;Aman&quot;, 20);      // parameterized constructor
+
+    cout &lt;&lt; s1.name &lt;&lt; &quot; &quot; &lt;&lt; s1.age &lt;&lt; endl;
+    cout &lt;&lt; s2.name &lt;&lt; &quot; &quot; &lt;&lt; s2.age &lt;&lt; endl;
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Student:
+    # Python has ONE __init__, but default args simulate overloading
+    def __init__(self, name=&quot;Unknown&quot;, age=0):
+        self.name = name
+        self.age = age
+        print(&quot;Constructor called&quot;)
+
+
+s1 = Student()               # uses defaults -&gt; &quot;Unknown&quot;, 0
+s2 = Student(&quot;Aman&quot;, 20)      # parameterized
+
+print(s1.name, s1.age)
+print(s2.name, s2.age)</code></pre></div>
+</div>
+<div class="callout warn"><strong>Python cannot overload <code>__init__</code></strong> the way C++ overloads constructors &mdash; a class has exactly one <code>__init__</code>. Default parameter values, <code>*args</code>/<code>**kwargs</code>, or classmethod "factory" functions are used instead to simulate multiple constructors.</div>
+</section>
+
+<section class="topic" id="t6">
+  <div class="topic-head"><span class="idx">06</span><h2>The this Pointer</h2></div>
+  <div class="theory">
+
+<p><code>this</code> is an implicit pointer inside every non-static C++ member function, pointing to the current object. Used to:</p>
+<ol>
+<li>Resolve naming conflicts between member variables and parameters.</li>
+<li>Return the current object (method chaining).</li>
+<li>Pass the current object&rsquo;s address elsewhere.</li>
+</ol>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Box {
+    public:
+        int length;
+
+        Box(int length) {
+            this-&gt;length = length;   // this-&gt;length = member, length = param
+        }
+
+        void show() {
+            cout &lt;&lt; &quot;Length: &quot; &lt;&lt; this-&gt;length &lt;&lt; endl;
+        }
+
+        Box&amp; setLength(int length) {
+            this-&gt;length = length;
+            return *this;             // enables chaining
+        }
+};
+
+int main() {
+    Box b(10);
+    b.show();                 // Length: 10
+    b.setLength(20).show();   // Length: 20
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Box:
+    def __init__(self, length):
+        self.length = length     # &#x27;self&#x27; is Python&#x27;s explicit equivalent of &#x27;this&#x27;
+
+    def show(self):
+        print(f&quot;Length: {self.length}&quot;)
+
+    def set_length(self, length):
+        self.length = length
+        return self               # enables chaining, like returning *this
+
+b = Box(10)
+b.show()                          # Length: 10
+b.set_length(20).show()           # Length: 20</code></pre></div>
+</div>
+<div class="callout"><strong>Python equivalent:</strong> <code>self</code> is explicit and must be the first parameter of every instance method &mdash; Python never hides it the way C++ hides <code>this</code>. There is no dereferencing needed (<code>self</code> is already the object, not a pointer).</div>
+</section>
+
+<section class="topic" id="t7">
+  <div class="topic-head"><span class="idx">07</span><h2>Copy Constructor</h2></div>
+  <div class="theory">
+
+<p>A <strong>copy constructor</strong> creates a new object as a copy of an existing object of the same class.</p>
+<p>Called when: (1) an object is initialized from another object, (2) an object is passed by value, (3) an object is returned by value.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Student {
+    public:
+        string name;
+        int age;
+
+        Student(string n, int a) { name = n; age = a; }
+
+        // User-defined copy constructor
+        Student(const Student &amp;s) {
+            name = s.name;
+            age = s.age;
+            cout &lt;&lt; &quot;Copy constructor called&quot; &lt;&lt; endl;
+        }
+};
+
+int main() {
+    Student s1(&quot;Priya&quot;, 21);
+    Student s2 = s1;    // Copy constructor invoked
+
+    cout &lt;&lt; s2.name &lt;&lt; &quot; &quot; &lt;&lt; s2.age &lt;&lt; endl;
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">import copy
+
+class Student:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+
+s1 = Student(&quot;Priya&quot;, 21)
+
+# Plain assignment does NOT copy - it just aliases the same object!
+s2_alias = s1
+s2_alias.name = &quot;Changed&quot;
+print(s1.name)   # &quot;Changed&quot; too! s1 and s2_alias are the SAME object
+
+# To actually copy, use the copy module
+s3 = copy.copy(s1)     # shallow copy - new object, own top-level attributes
+print(s3.name, s3.age)  # &quot;Changed&quot; 21 - independent from s1 now</code></pre></div>
+</div>
+<div class="callout warn"><strong>Big difference:</strong> in C++, <code>Student s2 = s1;</code> always creates a real copy via the copy constructor. In Python, plain assignment (<code>s2 = s1</code>) never copies &mdash; it just binds a second name to the same object. Real copies need the <code>copy</code> module: <code>copy.copy()</code> (shallow) or <code>copy.deepcopy()</code> (deep).</div>
+</section>
+
+<section class="topic" id="t8">
+  <div class="topic-head"><span class="idx">08</span><h2>Shallow Copy vs Deep Copy</h2></div>
+  <div class="theory">
+
+<p>One of the most frequently asked OOP interview topics, especially for classes managing dynamic memory / references.</p>
+<table class="reftable">
+<tr><th>Aspect</th><th>Shallow Copy</th><th>Deep Copy</th></tr>
+<tr><td>What is copied</td><td>Pointer / reference address</td><td>Actual data pointed to</td></tr>
+<tr><td>Memory</td><td>Shared between objects</td><td>Independent per object</td></tr>
+<tr><td>Risk</td><td>Dangling pointer, double-free</td><td>None (if done correctly)</td></tr>
+</table>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Deep {
+    public:
+        int* data;
+
+        Deep(int val) { data = new int(val); }
+
+        // User-defined DEEP copy constructor
+        Deep(const Deep &amp;source) {
+            data = new int(*source.data);  // new memory, copy the VALUE
+        }
+
+        ~Deep() { delete data; }   // safe - each object owns its own memory
+};
+
+int main() {
+    Deep d1(100);
+    Deep d2 = d1;          // deep copy
+    *d2.data = 200;
+
+    cout &lt;&lt; &quot;d1.data = &quot; &lt;&lt; *d1.data &lt;&lt; endl;  // 100 (unaffected)
+    cout &lt;&lt; &quot;d2.data = &quot; &lt;&lt; *d2.data &lt;&lt; endl;  // 200
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>d1.data = 100\nd2.data = 200</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">import copy
+
+class Deep:
+    def __init__(self, val):
+        self.data = [val]     # a mutable container, like a &quot;pointer&quot; to a value
+
+d1 = Deep(100)
+
+d2_shallow = copy.copy(d1)
+d2_shallow.data[0] = 999
+print(d1.data)          # [999] - CHANGED! shallow copy shared the inner list
+
+d1 = Deep(100)  # reset
+d2_deep = copy.deepcopy(d1)
+d2_deep.data[0] = 200
+print(d1.data)           # [100] - unaffected
+print(d2_deep.data)      # [200] - independent</code></pre><div class="output-block"><span class="lbl">Output</span>[999]
+[100]
+[200]</div></div>
+</div>
+<div class="callout"><strong>Python parallel:</strong> <code>copy.copy()</code> mirrors C++&rsquo;s default (shallow, compiler-generated) copy constructor &mdash; nested mutable objects (lists, dicts, custom objects) are shared. <code>copy.deepcopy()</code> mirrors a hand-written C++ deep copy constructor &mdash; it recursively copies everything.</div>
+</section>
+
+<section class="topic" id="t9">
+  <div class="topic-head"><span class="idx">09</span><h2>Destructor</h2></div>
+  <div class="theory">
+
+<p>A <strong>destructor</strong> is automatically called when an object goes out of scope or is deleted, used to release resources.</p>
+<ul>
+<li>Same name as class, prefixed with <code>~</code> in C++; no parameters, no return type.</li>
+<li>Cannot be overloaded &mdash; exactly one destructor per class.</li>
+<li>Called in reverse order of creation for stack objects going out of scope.</li>
+</ul>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Resource {
+    public:
+        int* ptr;
+
+        Resource(int val) {
+            ptr = new int(val);
+            cout &lt;&lt; &quot;Constructor: resource acquired&quot; &lt;&lt; endl;
+        }
+
+        ~Resource() {
+            delete ptr;
+            cout &lt;&lt; &quot;Destructor: resource released&quot; &lt;&lt; endl;
+        }
+};
+
+int main() {
+    {
+        Resource r(50);
+        cout &lt;&lt; &quot;Inside scope, value = &quot; &lt;&lt; *r.ptr &lt;&lt; endl;
+    } // destructor auto-called here
+
+    cout &lt;&lt; &quot;Outside scope&quot; &lt;&lt; endl;
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Constructor: resource acquired\nInside scope, value = 50\nDestructor: resource released\nOutside scope</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Resource:
+    def __init__(self, val):
+        self.val = val
+        print(&quot;Constructor: resource acquired&quot;)
+
+    def __del__(self):
+        print(&quot;Destructor: resource released&quot;)
+
+
+def demo():
+    r = Resource(50)
+    print(f&quot;Inside scope, value = {r.val}&quot;)
+    # __del__ called when r&#x27;s reference count hits 0
+    # (typically when function ends / object is garbage collected)
+
+demo()
+print(&quot;Outside scope&quot;)</code></pre><div class="output-block"><span class="lbl">Output</span>Constructor: resource acquired
+Inside scope, value = 50
+Destructor: resource released
+Outside scope</div></div>
+</div>
+<div class="callout warn"><strong>Important difference:</strong> C++ destructors run <em>deterministically</em> the instant an object goes out of scope (stack unwinding). Python's <code>__del__</code> runs when the <strong>garbage collector</strong> reclaims the object &mdash; timing is not guaranteed, especially with reference cycles. For deterministic cleanup in Python, use <code>with</code> statements / context managers instead of relying on <code>__del__</code>.</div>
+</section>
+
+<section class="topic" id="t10">
+  <div class="topic-head"><span class="idx">10</span><h2>Inheritance</h2></div>
+  <div class="theory">
+
+<p><strong>Inheritance</strong> lets a derived/child class acquire the properties and behaviors of a base/parent class &mdash; models real-world "is-a" relationships and promotes code reuse.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Vehicle {
+    public:
+        string brand;
+        void honk() { cout &lt;&lt; brand &lt;&lt; &quot; vehicle honks!&quot; &lt;&lt; endl; }
+};
+
+class Car : public Vehicle {
+    public:
+        int numDoors;
+        void showDoors() {
+            cout &lt;&lt; &quot;This car has &quot; &lt;&lt; numDoors &lt;&lt; &quot; doors.&quot; &lt;&lt; endl;
+        }
+};
+
+int main() {
+    Car c;
+    c.brand = &quot;Toyota&quot;;     // inherited
+    c.numDoors = 4;
+
+    c.honk();        // Toyota vehicle honks!
+    c.showDoors();   // This car has 4 doors.
+    return 0;
+}</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Vehicle:
+    def __init__(self, brand):
+        self.brand = brand
+
+    def honk(self):
+        print(f&quot;{self.brand} vehicle honks!&quot;)
+
+
+class Car(Vehicle):              # Car inherits from Vehicle
+    def __init__(self, brand, num_doors):
+        super().__init__(brand)   # call the parent constructor
+        self.num_doors = num_doors
+
+    def show_doors(self):
+        print(f&quot;This car has {self.num_doors} doors.&quot;)
+
+
+c = Car(&quot;Toyota&quot;, 4)
+c.honk()          # Toyota vehicle honks!  (inherited method)
+c.show_doors()    # This car has 4 doors.</code></pre></div>
+</div>
+<div class="callout"><code>class Car : public Vehicle</code> in C++ corresponds to <code>class Car(Vehicle):</code> in Python. C++&rsquo;s implicit base-constructor call is explicit in Python via <code>super().__init__(...)</code>.</div>
+</section>
+
+<section class="topic" id="t11">
+  <div class="topic-head"><span class="idx">11</span><h2>Modes of Inheritance</h2></div>
+  <div class="theory">
+
+<p>The access specifier used while inheriting determines how base class members are accessible in the derived class.</p>
+<table class="reftable">
+<tr><th>Base member</th><th>public inheritance</th><th>protected inheritance</th><th>private inheritance</th></tr>
+<tr><td>public</td><td>public</td><td>protected</td><td>private</td></tr>
+<tr><td>protected</td><td>protected</td><td>protected</td><td>private</td></tr>
+<tr><td>private</td><td>inaccessible</td><td>inaccessible</td><td>inaccessible</td></tr>
+</table>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Base {
+    public:    int a;
+    protected: int b;
+    private:   int c;
+};
+
+class PublicDerived    : public    Base { /* a-&gt;public, b-&gt;protected, c-&gt;inaccessible */ };
+class ProtectedDerived : protected Base { /* a-&gt;protected, b-&gt;protected, c-&gt;inaccessible */ };
+class PrivateDerived   : private   Base { /* a-&gt;private, b-&gt;private, c-&gt;inaccessible */ };</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python"># Python has no &quot;inheritance mode&quot; keyword (public/protected/private inheritance).
+# Inheritance is always effectively &quot;public&quot; - the derived class gets everything
+# except name-mangled __private attributes are still access-restricted by mangling.
+
+class Base:
+    def __init__(self):
+        self.a = 1          # public-by-convention
+        self._b = 2         # protected-by-convention
+        self.__c = 3        # private-by-convention (name-mangled)
+
+class Derived(Base):
+    def show(self):
+        print(self.a)        # OK
+        print(self._b)        # OK (convention allows it)
+        # print(self.__c)     # AttributeError - mangled to _Base__c
+        print(self._Base__c)  # works, but you&#x27;re not &quot;supposed to&quot; do this</code></pre></div>
+</div>
+<div class="callout warn">Python has <strong>no equivalent</strong> of public/protected/private inheritance modes &mdash; there is only one style of inheritance. Encapsulation strictness in Python comes entirely from naming convention, not from the inheritance declaration itself.</div>
+</section>
+
+<section class="topic" id="t12">
+  <div class="topic-head"><span class="idx">12</span><h2>Types of Inheritance</h2></div>
+  <div class="theory">
+
+<table class="reftable">
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td>Single</td><td>One derived class inherits from one base class</td></tr>
+<tr><td>Multiple</td><td>One derived class inherits from more than one base class</td></tr>
+<tr><td>Multilevel</td><td>A class derived from a class, itself derived from another (chain)</td></tr>
+<tr><td>Hierarchical</td><td>Multiple derived classes inherit from a single base class</td></tr>
+<tr><td>Hybrid</td><td>Combination of two or more types above</td></tr>
+</table>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">// Multiple Inheritance
+class Flyable {
+    public: void fly() { cout &lt;&lt; &quot;can fly&quot; &lt;&lt; endl; }
+};
+class Swimmable {
+    public: void swim() { cout &lt;&lt; &quot;can swim&quot; &lt;&lt; endl; }
+};
+class Duck : public Flyable, public Swimmable {
+    // Duck can both fly() and swim()
+};
+
+// Multilevel Inheritance
+class LivingBeing { public: void breathe() { cout &lt;&lt; &quot;breathes&quot; &lt;&lt; endl; } };
+class Animal : public LivingBeing { public: void eat() { cout &lt;&lt; &quot;eats&quot; &lt;&lt; endl; } };
+class Dog : public Animal { public: void bark() { cout &lt;&lt; &quot;barks&quot; &lt;&lt; endl; } };
+// Dog has breathe(), eat(), AND bark()
+
+// Hybrid (also causes the &quot;diamond problem&quot;)
+class A { public: void a() {} };
+class B : public A { public: void b() {} };
+class C : public A { public: void c() {} };
+class D : public B, public C { public: void d() {} };
+// Fix with virtual inheritance:
+// class B : virtual public A {};
+// class C : virtual public A {};</code></pre></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python"># Multiple Inheritance - Python supports this natively and simply
+class Flyable:
+    def fly(self): print(&quot;can fly&quot;)
+
+class Swimmable:
+    def swim(self): print(&quot;can swim&quot;)
+
+class Duck(Flyable, Swimmable):     # multiple inheritance - no extra syntax needed
+    pass
+
+d = Duck()
+d.fly()    # can fly
+d.swim()   # can swim
+
+# Multilevel Inheritance
+class LivingBeing:
+    def breathe(self): print(&quot;breathes&quot;)
+
+class Animal(LivingBeing):
+    def eat(self): print(&quot;eats&quot;)
+
+class Dog(Animal):
+    def bark(self): print(&quot;barks&quot;)
+
+dog = Dog()
+dog.breathe(); dog.eat(); dog.bark()
+
+# &quot;Diamond problem&quot; - Python solves this automatically via
+# the C3 Linearization algorithm (Method Resolution Order / MRO)
+class A:
+    def hello(self): print(&quot;A&quot;)
+
+class B(A): pass
+class C(A): pass
+class D(B, C): pass
+
+print(D.mro())  # shows the exact resolution order Python computes automatically</code></pre></div>
+</div>
+<div class="callout"><strong>Diamond problem:</strong> C++ requires manual <code>virtual</code> inheritance to avoid duplicate base-class copies. Python resolves this automatically using the <strong>MRO (Method Resolution Order)</strong> via C3 linearization &mdash; call <code>ClassName.mro()</code> or <code>ClassName.__mro__</code> to inspect it.</div>
+</section>
+
+<section class="topic" id="t13">
+  <div class="topic-head"><span class="idx">13</span><h2>Polymorphism</h2></div>
+  <div class="theory">
+
+<p><strong>Polymorphism</strong> = "many forms" &mdash; the same interface behaves differently depending on context.</p>
+<table class="reftable">
+<tr><th>Type</th><th>Also called</th><th>Resolved at</th></tr>
+<tr><td>Compile-time Polymorphism</td><td>Static / Early binding</td><td>Compile time</td></tr>
+<tr><td>Runtime Polymorphism</td><td>Dynamic / Late binding</td><td>Run time</td></tr>
+</table>
+<p>Compile-time: Function Overloading, Operator Overloading. Runtime: Function Overriding + Virtual Functions.</p>
+
+  </div>
+
+<div class="callout warn"><strong>Python is dynamically typed</strong>, so it doesn&rsquo;t really have "compile-time" polymorphism the way C++ does. Python achieves flexible behavior mainly via <strong>duck typing</strong> (see below) and method overriding &mdash; both are effectively resolved at runtime.</div>
+</section>
+
+<section class="topic" id="t14">
+  <div class="topic-head"><span class="idx">14</span><h2>Function Overloading</h2></div>
+  <div class="theory">
+
+<p><strong>Function Overloading</strong>: multiple functions with the same name, different parameter lists, in the same scope. Compile-time polymorphism.</p>
+<ul>
+<li>Functions must differ in number and/or type of parameters.</li>
+<li>Return type alone cannot distinguish overloaded functions.</li>
+</ul>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Calculator {
+    public:
+        int add(int a, int b) { return a + b; }
+        double add(double a, double b) { return a + b; }
+        int add(int a, int b, int c) { return a + b + c; }
+};
+
+int main() {
+    Calculator calc;
+    cout &lt;&lt; calc.add(2, 3) &lt;&lt; endl;         // add(int,int) -&gt; 5
+    cout &lt;&lt; calc.add(2.5, 3.5) &lt;&lt; endl;     // add(double,double) -&gt; 6.0
+    cout &lt;&lt; calc.add(1, 2, 3) &lt;&lt; endl;      // add(int,int,int) -&gt; 6
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>5\n6\n6</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python"># Python does NOT support true function overloading -
+# a later definition of the same name simply overwrites the earlier one.
+# Workarounds: default arguments, *args, or functools.singledispatch
+
+class Calculator:
+    def add(self, a, b, c=None):
+        if c is not None:
+            return a + b + c
+        return a + b
+
+
+calc = Calculator()
+print(calc.add(2, 3))        # 5
+print(calc.add(2.5, 3.5))    # 6.0
+print(calc.add(1, 2, 3))     # 6
+
+# More &quot;proper&quot; overloading using functools.singledispatch (module-level functions)
+from functools import singledispatch
+
+@singledispatch
+def describe(arg):
+    print(f&quot;Unknown type: {arg}&quot;)
+
+@describe.register
+def _(arg: int):
+    print(f&quot;Integer: {arg}&quot;)
+
+@describe.register
+def _(arg: str):
+    print(f&quot;String: {arg}&quot;)
+
+describe(5)      # Integer: 5
+describe(&quot;hi&quot;)   # String: hi</code></pre><div class="output-block"><span class="lbl">Output</span>5
+6.0
+6
+Integer: 5
+String: hi</div></div>
+</div>
+<div class="callout warn"><strong>Key interview point:</strong> Python has no native function overloading &mdash; defining <code>add()</code> twice just replaces the first definition. Simulate it with default/variadic arguments, or use <code>functools.singledispatch</code> for real type-based dispatch.</div>
+</section>
+
+<section class="topic" id="t15">
+  <div class="topic-head"><span class="idx">15</span><h2>Function Overriding</h2></div>
+  <div class="theory">
+
+<p><strong>Function Overriding</strong>: a derived class redefines a base class member function with the same name, parameters, and return type. Core to runtime polymorphism.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Animal {
+    public:
+        void sound() { cout &lt;&lt; &quot;Animal makes a sound&quot; &lt;&lt; endl; }
+};
+
+class Dog : public Animal {
+    public:
+        void sound() { cout &lt;&lt; &quot;Dog barks&quot; &lt;&lt; endl; }   // overrides
+};
+
+int main() {
+    Dog d;
+    d.sound();          // Dog barks
+
+    Animal* aptr = &amp;d;
+    aptr-&gt;sound();       // WITHOUT virtual: calls Animal::sound() - wrong!
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Dog barks\nAnimal makes a sound</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Animal:
+    def sound(self):
+        print(&quot;Animal makes a sound&quot;)
+
+class Dog(Animal):
+    def sound(self):          # overrides Animal.sound()
+        print(&quot;Dog barks&quot;)
+
+d = Dog()
+d.sound()          # Dog barks
+
+a_ref: Animal = d
+a_ref.sound()      # Dog barks - ALWAYS correct in Python, no &quot;virtual&quot; needed!</code></pre><div class="output-block"><span class="lbl">Output</span>Dog barks
+Dog barks</div></div>
+</div>
+<div class="callout warn"><strong>Major difference:</strong> in C++, overriding through a base-class pointer only works correctly if the base method is <code>virtual</code> (see next topic) &mdash; otherwise it silently calls the base version (static binding). In Python, <strong>all</strong> method calls are dynamically dispatched by default &mdash; there is no separate "virtual" keyword needed; overriding always works correctly.</div>
+</section>
+
+<section class="topic" id="t16">
+  <div class="topic-head"><span class="idx">16</span><h2>Virtual Functions</h2></div>
+  <div class="theory">
+
+<p>A <strong>virtual function</strong> tells the C++ compiler to support runtime polymorphism &mdash; the function called is determined by the <strong>actual object type</strong>, resolved at runtime via a vtable.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Animal {
+    public:
+        virtual void sound() { cout &lt;&lt; &quot;Animal makes a sound&quot; &lt;&lt; endl; }
+        virtual ~Animal() {}         // virtual destructor - important!
+};
+
+class Dog : public Animal {
+    public:
+        void sound() override { cout &lt;&lt; &quot;Dog barks&quot; &lt;&lt; endl; }
+};
+
+class Cat : public Animal {
+    public:
+        void sound() override { cout &lt;&lt; &quot;Cat meows&quot; &lt;&lt; endl; }
+};
+
+int main() {
+    Animal* animals[3];
+    Dog d; Cat c; Animal a;
+    animals[0] = &amp;a; animals[1] = &amp;d; animals[2] = &amp;c;
+
+    for (int i = 0; i &lt; 3; i++) {
+        animals[i]-&gt;sound();   // correct derived version called - runtime polymorphism!
+    }
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Animal makes a sound\nDog barks\nCat meows</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Animal:
+    def sound(self):
+        print(&quot;Animal makes a sound&quot;)
+
+class Dog(Animal):
+    def sound(self):
+        print(&quot;Dog barks&quot;)
+
+class Cat(Animal):
+    def sound(self):
+        print(&quot;Cat meows&quot;)
+
+
+animals = [Animal(), Dog(), Cat()]
+for a in animals:
+    a.sound()   # correct version always called - Python has NO &#x27;virtual&#x27; keyword
+                # because every method lookup already happens dynamically at runtime</code></pre><div class="output-block"><span class="lbl">Output</span>Animal makes a sound
+Dog barks
+Cat meows</div></div>
+</div>
+<div class="callout"><strong>Python has no <code>virtual</code> keyword</strong> because <em>every</em> method call is looked up dynamically on the actual object&rsquo;s type at runtime (this is just how Python&rsquo;s attribute lookup works). What C++ has to opt into with <code>virtual</code>, Python does unconditionally.</div>
+</section>
+
+<section class="topic" id="t17">
+  <div class="topic-head"><span class="idx">17</span><h2>Abstraction</h2></div>
+  <div class="theory">
+
+<p><strong>Abstraction</strong> = hiding internal implementation details, showing only essential features. Focuses on <em>what</em> an object does, not <em>how</em>.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Car {
+    private:
+        void startEngine() {       // hidden internal detail
+            cout &lt;&lt; &quot;Engine internals starting...&quot; &lt;&lt; endl;
+        }
+
+    public:
+        void drive() {              // exposed simplified interface
+            startEngine();
+            cout &lt;&lt; &quot;Car is now driving&quot; &lt;&lt; endl;
+        }
+};
+
+int main() {
+    Car c;
+    c.drive();          // user only interacts with drive()
+    // c.startEngine(); // ERROR - hidden
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Engine internals starting...\nCar is now driving</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Car:
+    def __start_engine(self):        # name-mangled &quot;private&quot; - hidden internal detail
+        print(&quot;Engine internals starting...&quot;)
+
+    def drive(self):                  # exposed simplified interface
+        self.__start_engine()
+        print(&quot;Car is now driving&quot;)
+
+
+c = Car()
+c.drive()
+# c.__start_engine()   # AttributeError (name-mangled to _Car__start_engine)</code></pre><div class="output-block"><span class="lbl">Output</span>Engine internals starting...
+Car is now driving</div></div>
+</div>
+<div class="callout"><strong>Duck typing note:</strong> Python leans heavily on <em>duck typing</em> for abstraction &mdash; "if it walks like a duck and quacks like a duck, treat it as a duck." Code often doesn&rsquo;t check an object&rsquo;s exact type at all, just that it has the method being called.</div>
+</section>
+
+<section class="topic" id="t18">
+  <div class="topic-head"><span class="idx">18</span><h2>Abstract Class</h2></div>
+  <div class="theory">
+
+<p>An <strong>abstract class</strong> cannot be instantiated directly &mdash; used only as a base class. It contains at least one <strong>pure virtual function</strong> in C++ (<code>= 0</code>), which derived classes must override.</p>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Shape {   // abstract class
+    public:
+        virtual double area() = 0;      // pure virtual - no body
+        virtual void display() {         // regular virtual - has default body
+            cout &lt;&lt; &quot;This is a shape&quot; &lt;&lt; endl;
+        }
+};
+
+class Circle : public Shape {
+    private:
+        double radius;
+    public:
+        Circle(double r) : radius(r) {}
+        double area() override { return 3.14159 * radius * radius; }
+};
+
+class Rectangle : public Shape {
+    private:
+        double length, width;
+    public:
+        Rectangle(double l, double w) : length(l), width(w) {}
+        double area() override { return length * width; }
+};
+
+int main() {
+    // Shape s;   // ERROR - cannot instantiate abstract class
+    Shape* shapes[2];
+    shapes[0] = new Circle(5);
+    shapes[1] = new Rectangle(4, 6);
+
+    for (int i = 0; i &lt; 2; i++)
+        cout &lt;&lt; &quot;Area: &quot; &lt;&lt; shapes[i]-&gt;area() &lt;&lt; endl;
+
+    delete shapes[0];
+    delete shapes[1];
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Area: 78.5397\nArea: 24</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">from abc import ABC, abstractmethod
+
+class Shape(ABC):                     # inherit from ABC to make it abstract
+    @abstractmethod
+    def area(self):                    # pure virtual equivalent - no implementation
+        pass
+
+    def display(self):                 # regular method - has a default body
+        print(&quot;This is a shape&quot;)
+
+
+class Circle(Shape):
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):
+        return 3.14159 * self.radius ** 2
+
+
+class Rectangle(Shape):
+    def __init__(self, length, width):
+        self.length = length
+        self.width = width
+
+    def area(self):
+        return self.length * self.width
+
+
+# s = Shape()   # TypeError: Can&#x27;t instantiate abstract class Shape with abstract method area
+
+shapes = [Circle(5), Rectangle(4, 6)]
+for s in shapes:
+    print(f&quot;Area: {s.area()}&quot;)</code></pre><div class="output-block"><span class="lbl">Output</span>Area: 78.53975
+Area: 24</div></div>
+</div>
+<div class="callout"><strong>C++ <code>virtual func() = 0</code> &harr; Python <code>@abstractmethod</code></strong> (from the <code>abc</code> module, class must inherit <code>ABC</code>). Both raise an error if you try to instantiate the abstract class directly, and both force any concrete subclass to implement the missing method.</div>
+</section>
+
+<section class="topic" id="t19">
+  <div class="topic-head"><span class="idx">19</span><h2>Static Keyword</h2></div>
+  <div class="theory">
+
+<p><code>static</code> changes the lifetime/scope of variables or functions.</p>
+<ul>
+<li><strong>Static data members</strong>: shared by all objects of a class &mdash; one copy total.</li>
+<li><strong>Static member functions</strong>: callable without an object; can only access static data.</li>
+<li><strong>Static local variables</strong>: retain value between function calls.</li>
+</ul>
+
+  </div>
+<div class="codebox">
+  <div class="tabbar">
+    <button class="tabbtn active" data-lang="cpp"><span class="dot"></span>C++</button>
+    <button class="tabbtn" data-lang="python"><span class="dot"></span>Python</button>
+  </div>
+  <div class="pane active" data-lang="cpp"><pre><code class="language-cpp">class Counter {
+    private:
+        static int count;      // declaration - shared across all objects
+
+    public:
+        Counter() { count++; }
+        static int getCount() { return count; }   // static member function
+};
+
+int Counter::count = 0;   // definition, required outside the class
+
+int main() {
+    Counter c1, c2, c3;
+    cout &lt;&lt; &quot;Total objects created: &quot; &lt;&lt; Counter::getCount() &lt;&lt; endl;  // 3
+    return 0;
+}</code></pre><div class="output-block"><span class="lbl">Output</span>Total objects created: 3</div></div>
+  <div class="pane" data-lang="python"><pre><code class="language-python">class Counter:
+    count = 0    # class variable - shared across ALL instances (like C++ static member)
+
+    def __init__(self):
+        Counter.count += 1     # modify via the class, not self
+
+    @staticmethod
+    def get_count():            # static method - no &#x27;self&#x27;, callable without an instance
+        return Counter.count
+
+
+c1 = Counter()
+c2 = Counter()
+c3 = Counter()
+
+print(f&quot;Total objects created: {Counter.get_count()}&quot;)   # 3
+# Also callable as: Counter.get_count()</code></pre><div class="output-block"><span class="lbl">Output</span>Total objects created: 3</div></div>
+</div>
+<div class="callout"><strong>Mapping:</strong> C++ <code>static int count;</code> (member) &harr; Python <strong>class variable</strong> (<code>count = 0</code> defined directly in the class body, shared by all instances). C++ <code>static</code> member function &harr; Python <code>@staticmethod</code> (or <code>@classmethod</code> if it needs access to the class itself via <code>cls</code>).</div>
+</section>
+
+<section class="topic" id="t20">
+  <div class="topic-head"><span class="idx">20</span><h2>Quick Revision Cheatsheet</h2></div>
+  <div class="theory">
+
+<table class="reftable cheat-grid">
+<tr><th>Concept</th><th>Definition</th></tr>
+<tr><td>Class</td><td>Blueprint for creating objects</td></tr>
+<tr><td>Object</td><td>Instance of a class occupying real memory</td></tr>
+<tr><td>Encapsulation</td><td>Bundling data + methods, restricting direct access</td></tr>
+<tr><td>Abstraction</td><td>Hiding implementation, showing only essentials</td></tr>
+<tr><td>Constructor</td><td>Auto-called on object creation, initializes data</td></tr>
+<tr><td>this / self</td><td>Refers to the current object invoking the method</td></tr>
+<tr><td>Copy Constructor</td><td>Creates a new object as a copy of an existing one</td></tr>
+<tr><td>Shallow Copy</td><td>Copies reference/address (shared memory)</td></tr>
+<tr><td>Deep Copy</td><td>Allocates new memory, copies actual values</td></tr>
+<tr><td>Destructor</td><td>Auto-called on scope exit / GC; releases resources</td></tr>
+<tr><td>Inheritance</td><td>Derived class acquires base class members</td></tr>
+<tr><td>Function Overloading</td><td>Same name, different params &mdash; compile-time (C++ only)</td></tr>
+<tr><td>Function Overriding</td><td>Derived class redefines base method, same signature</td></tr>
+<tr><td>Virtual Function</td><td>Enables runtime polymorphism (default behavior in Python)</td></tr>
+<tr><td>Abstract Class</td><td>Cannot be instantiated; has &ge;1 unimplemented method</td></tr>
+<tr><td>Static Member</td><td>One copy shared across all objects of the class</td></tr>
+</table>
+
+<h3 style="color:var(--text-bright); font-size:16px; margin:24px 0 10px;">C++ &harr; Python Quick Map</h3>
+<table class="reftable">
+<tr><th>C++</th><th>Python</th></tr>
+<tr><td><code>this</code></td><td><code>self</code> (explicit first parameter)</td></tr>
+<tr><td>Constructor overloading</td><td>Default args / <code>*args</code> / <code>classmethod</code> factories</td></tr>
+<tr><td><code>virtual</code> function</td><td>Not needed &mdash; always dynamic dispatch</td></tr>
+<tr><td>Pure virtual (<code>= 0</code>)</td><td><code>@abstractmethod</code> + <code>ABC</code></td></tr>
+<tr><td>Function overloading</td><td>Not supported natively &mdash; use defaults or <code>singledispatch</code></td></tr>
+<tr><td><code>private</code> / <code>protected</code></td><td>Convention only: <code>_var</code> / <code>__var</code> (name-mangled)</td></tr>
+<tr><td><code>static</code> member</td><td>Class variable</td></tr>
+<tr><td><code>static</code> member function</td><td><code>@staticmethod</code> / <code>@classmethod</code></td></tr>
+<tr><td>Destructor (deterministic)</td><td><code>__del__</code> (non-deterministic, GC-driven)</td></tr>
+<tr><td>Diamond problem &rarr; <code>virtual</code> inheritance</td><td>Resolved automatically via MRO (C3 linearization)</td></tr>
+</table>
+
+<h3 style="color:var(--text-bright); font-size:16px; margin:24px 0 10px;">Common "Difference Between" Questions</h3>
+<table class="reftable">
+<tr><th>Comparison</th><th>Key Difference</th></tr>
+<tr><td>Overloading vs Overriding</td><td>Overloading = same class, different params, compile-time. Overriding = base/derived, same signature, runtime.</td></tr>
+<tr><td>Shallow vs Deep Copy</td><td>Shallow shares memory; Deep duplicates memory.</td></tr>
+<tr><td>Abstraction vs Encapsulation</td><td>Abstraction hides implementation detail (design level); Encapsulation hides data (access-control level).</td></tr>
+<tr><td>Class vs Object</td><td>Class = blueprint (no memory); Object = instance (occupies memory).</td></tr>
+<tr><td>Struct vs Class (C++)</td><td>Default access: struct &rarr; public, class &rarr; private.</td></tr>
+</table>
+
+  </div>
+
+
+</section>
+
+
+  </main>
+</div>
+
+<script>
+hljs.registerLanguage('cpp', hljs.getLanguage('cpp') || (window.hljsCpp));
+</script>
+<script>
+// Tab switching
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.tabbtn');
+  if(!btn) return;
+  const box = btn.closest('.codebox');
+  box.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+  box.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  box.querySelector('.pane[data-lang="'+btn.dataset.lang+'"]').classList.add('active');
+});
+
+// Mobile sidebar toggle
+const sidebar = document.getElementById('sidebar');
+const mobileToggle = document.getElementById('mobileToggle');
+const toggleIcon = document.getElementById('toggleIcon');
+if(mobileToggle){
+  mobileToggle.addEventListener('click', function(){
+    sidebar.classList.toggle('open');
+    toggleIcon.textContent = sidebar.classList.contains('open') ? '▴' : '▾';
+  });
+}
+
+// Active nav highlight on scroll
+const navLinks = Array.from(document.querySelectorAll('.navlist a'));
+const sections = navLinks.map(l => document.querySelector(l.getAttribute('href')));
+function onScroll(){
+  let idx = 0;
+  const scrollPos = window.scrollY + 100;
+  sections.forEach((sec, i) => {
+    if(sec && sec.offsetTop <= scrollPos) idx = i;
+  });
+  navLinks.forEach(l => l.classList.remove('active'));
+  if(navLinks[idx]) navLinks[idx].classList.add('active');
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+
+// Close mobile sidebar after nav click
+navLinks.forEach(l => l.addEventListener('click', () => {
+  if(window.innerWidth <= 880){
+    sidebar.classList.remove('open');
+    toggleIcon.textContent = '▾';
+  }
+}));
+
+// Syntax highlight all code blocks
+document.querySelectorAll('pre code').forEach((el) => {
+  hljs.highlightElement(el);
+});
+</script>
+</body>
+</html>
