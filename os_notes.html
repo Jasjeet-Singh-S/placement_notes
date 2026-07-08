@@ -1,0 +1,2537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OS Reference — Interview Notes</title>
+<style>
+:root{
+  --bg:#0d1117;
+  --bg-elevated:#151b23;
+  --panel:#11151c;
+  --border:#232b36;
+  --text:#c9d1d9;
+  --text-dim:#7d8590;
+  --text-bright:#f0f3f6;
+  --accent:#5fb3d9;
+  --accent-2:#e0b34d;
+  --accent-green:#5fd996;
+  --accent-red:#e5636b;
+  --mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; background:var(--bg); color:var(--text); font-family:var(--sans); line-height:1.65; scroll-behavior:smooth; }
+::selection{ background:#264f78; color:#fff; }
+
+.wrap{ display:flex; min-height:100vh; }
+.sidebar{
+  width:270px; flex-shrink:0; background:var(--bg-elevated); border-right:1px solid var(--border);
+  position:sticky; top:0; height:100vh; overflow-y:auto; padding:20px 0 40px;
+}
+.sidebar::-webkit-scrollbar{ width:8px; }
+.sidebar::-webkit-scrollbar-thumb{ background:#2a3340; border-radius:4px; }
+.brand{ padding:0 20px 16px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+.brand .tag{ font-family:var(--mono); font-size:11px; letter-spacing:.12em; color:var(--accent-green); text-transform:uppercase; }
+.brand h1{ font-size:17px; margin:6px 0 0; color:var(--text-bright); font-weight:700; letter-spacing:-0.01em; }
+
+.navlist{ list-style:none; margin:0; padding:0 8px; }
+.navlist li{ margin:1px 0; }
+.navlist a{
+  display:flex; align-items:baseline; gap:8px; padding:7px 12px; border-radius:6px;
+  color:var(--text-dim); text-decoration:none; font-size:13.5px; transition:background .12s,color .12s;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.navlist a .num{ font-family:var(--mono); font-size:11px; color:#4c5560; flex-shrink:0; width:18px; }
+.navlist a:hover{ background:#1c232d; color:var(--text-bright); }
+.navlist a.active{ background:#1a2530; color:var(--accent); }
+.navlist a.active .num{ color:var(--accent); }
+
+.main{ flex:1; max-width:920px; padding:48px 56px 120px; }
+
+.doc-header{ margin-bottom:44px; }
+.doc-header .tag{ font-family:var(--mono); font-size:12px; letter-spacing:.1em; color:var(--accent-green); text-transform:uppercase; }
+.doc-header h1{ font-size:34px; margin:10px 0 8px; color:var(--text-bright); letter-spacing:-0.02em; font-weight:800; }
+.doc-header p{ color:var(--text-dim); font-size:15px; max-width:640px; }
+.pillars{ display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+.pillar-chip{ font-family:var(--mono); font-size:12px; border:1px solid var(--border); background:var(--bg-elevated); padding:6px 12px; border-radius:20px; color:var(--text-dim); }
+
+.topic{ margin-bottom:70px; scroll-margin-top:24px; }
+.topic-head{ display:flex; align-items:baseline; gap:12px; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+.topic-head .idx{ font-family:var(--mono); color:var(--accent); font-size:15px; font-weight:600; }
+.topic-head h2{ font-size:22px; margin:0; color:var(--text-bright); font-weight:700; letter-spacing:-0.01em; }
+
+.theory{ font-size:15px; color:var(--text); margin-bottom:14px; }
+.theory p{ margin:0 0 12px; }
+.theory ul, .theory ol{ margin:0 0 12px; padding-left:22px; }
+.theory li{ margin-bottom:5px; }
+.theory code{ font-family:var(--mono); background:#1a2129; color:var(--accent-green); padding:1px 6px; border-radius:4px; font-size:13px; }
+.theory strong{ color:var(--text-bright); }
+.theory h3{ font-size:16px; color:var(--text-bright); margin:20px 0 8px; }
+
+table.reftable{ width:100%; border-collapse:collapse; margin:14px 0 18px; font-size:13.5px; }
+table.reftable th, table.reftable td{ border:1px solid var(--border); padding:8px 12px; text-align:left; }
+table.reftable th{ background:var(--bg-elevated); color:var(--text-bright); font-weight:600; }
+table.reftable td{ color:var(--text); }
+table.reftable code{ font-family:var(--mono); color:var(--accent-green); font-size:12.5px; }
+
+.callout{ border-left:3px solid var(--accent-green); background:#111a15; padding:10px 16px; border-radius:0 6px 6px 0; font-size:13.5px; color:#a9d9bd; margin:14px 0; }
+.callout strong{ color:var(--accent-green); }
+.callout.warn{ border-left-color:var(--accent-2); background:#1a1610; color:#ecd08f; }
+.callout.warn strong{ color:var(--accent-2); }
+
+.diagram{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:14px 0; font-family:var(--mono); font-size:12.5px; color:var(--text-dim); white-space:pre; overflow-x:auto; line-height:1.5; }
+
+.diagram-svg{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin:14px 0; }
+.diagram-svg svg{ display:block; }
+.diagram-svg .t{ font-family:var(--sans); font-size:14px; fill:var(--text); }
+.diagram-svg .ts{ font-family:var(--sans); font-size:12px; fill:var(--text-dim); }
+.diagram-svg .th{ font-family:var(--sans); font-size:14px; font-weight:600; fill:var(--text-bright); }
+.diagram-svg .c-purple rect{ fill:#26215C; stroke:#7F77DD; }
+.diagram-svg .c-purple .th{ fill:#CECBF6; } .diagram-svg .c-purple .ts{ fill:#AFA9EC; }
+.diagram-svg .c-teal rect{ fill:#04342C; stroke:#1D9E75; }
+.diagram-svg .c-teal .th{ fill:#9FE1CB; } .diagram-svg .c-teal .ts{ fill:#5DCAA5; }
+.diagram-svg .c-coral rect{ fill:#4A1B0C; stroke:#D85A30; }
+.diagram-svg .c-coral .th{ fill:#F5C4B3; } .diagram-svg .c-coral .ts{ fill:#F0997B; }
+.diagram-svg .c-amber rect, .diagram-svg .c-amber circle{ fill:#412402; stroke:#EF9F27; }
+.diagram-svg .c-amber .th{ fill:#FAC775; } .diagram-svg .c-amber .ts{ fill:#EF9F27; }
+.diagram-svg .c-gray rect, .diagram-svg .c-gray circle{ fill:#2C2C2A; stroke:#888780; }
+.diagram-svg .c-gray .th{ fill:#D3D1C7; } .diagram-svg .c-gray .ts{ fill:#B4B2A9; }
+
+/* ---------- QUIZ ---------- */
+.quiz-section{ margin-top:28px; border-top:1px dashed var(--border); padding-top:24px; }
+.quiz-header{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.quiz-header .qicon{ font-size:15px; }
+.quiz-header h3{ font-size:15px; color:var(--text-bright); margin:0; font-family:var(--mono); letter-spacing:.02em; }
+.quiz-header .qcount{ font-family:var(--mono); font-size:11px; color:var(--text-dim); background:var(--bg-elevated); padding:3px 9px; border-radius:12px; border:1px solid var(--border); }
+
+.qcard{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:18px 20px; margin-bottom:14px; }
+.qcard .qtext{ font-size:14.5px; color:var(--text-bright); margin-bottom:14px; font-weight:500; }
+.qcard .qnum{ font-family:var(--mono); color:var(--accent); margin-right:6px; }
+
+.opts{ display:flex; flex-direction:column; gap:8px; }
+.opt{
+  display:flex; align-items:center; gap:10px;
+  text-align:left; width:100%;
+  background:var(--bg-elevated); border:1px solid var(--border); border-radius:8px;
+  padding:10px 14px; color:var(--text); font-size:13.5px; font-family:var(--sans);
+  cursor:pointer; transition:background .12s,border-color .12s,transform .06s;
+}
+.opt:hover:not(.locked){ border-color:#3a4452; background:#1a212b; }
+.opt:active:not(.locked){ transform:scale(0.995); }
+.opt .optletter{
+  font-family:var(--mono); font-size:11px; color:var(--text-dim);
+  width:20px; height:20px; border-radius:5px; background:#1c232d;
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.opt.correct{ border-color:var(--accent-green); background:#132119; }
+.opt.correct .optletter{ background:var(--accent-green); color:#0d1117; }
+.opt.incorrect{ border-color:var(--accent-red); background:#221415; }
+.opt.incorrect .optletter{ background:var(--accent-red); color:#0d1117; }
+.opt.locked{ cursor:default; }
+.opt.dimmed{ opacity:0.45; }
+
+.explain{
+  margin-top:12px; padding:12px 14px; border-radius:8px;
+  background:#0f1620; border:1px solid var(--border);
+  font-size:13px; color:var(--text-dim); display:none;
+}
+.explain.show{ display:block; }
+.explain .tag-result{ font-family:var(--mono); font-size:11px; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; display:block; font-weight:700; }
+.explain.correct-bg .tag-result{ color:var(--accent-green); }
+.explain.incorrect-bg .tag-result{ color:var(--accent-red); }
+
+.quiz-progress{ font-family:var(--mono); font-size:12px; color:var(--text-dim); margin-top:10px; text-align:right; }
+.quiz-progress .score{ color:var(--accent-green); font-weight:600; }
+
+footer.docfoot{ border-top:1px solid var(--border); margin-top:20px; padding-top:20px; font-size:12px; color:#4c5560; font-family:var(--mono); }
+
+.mobile-toggle{ display:none; }
+@media (max-width: 880px){
+  .wrap{ flex-direction:column; }
+  .sidebar{ width:100%; height:auto; position:relative; top:0; max-height:52px; overflow:hidden; transition:max-height .25s ease; }
+  .sidebar.open{ max-height:70vh; overflow-y:auto; }
+  .mobile-toggle{ display:flex; align-items:center; justify-content:space-between; width:100%; padding:14px 20px; background:none; border:none; color:var(--text-bright); font-family:var(--mono); font-size:13px; cursor:pointer; }
+  .main{ padding:32px 20px 100px; max-width:100%; }
+  .doc-header h1{ font-size:26px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="sidebar" id="sidebar">
+    <button class="mobile-toggle" id="mobileToggle">☰ Contents <span id="toggleIcon">▾</span></button>
+    <div class="brand">
+      <div class="tag">Placement Reference</div>
+      <h1>Operating Systems</h1>
+    </div>
+    <ul class="navlist" id="navlist">
+      <li><a href="#t1"><span class="num">01</span>Introduction to OS</a></li>
+      <li><a href="#t2"><span class="num">02</span>Process Management</a></li>
+      <li><a href="#t3"><span class="num">03</span>CPU Scheduling</a></li>
+      <li><a href="#t4"><span class="num">04</span>Process Synchronization</a></li>
+      <li><a href="#t5"><span class="num">05</span>Deadlocks</a></li>
+      <li><a href="#t6"><span class="num">06</span>Memory Management</a></li>
+      <li><a href="#t7"><span class="num">07</span>Paging &amp; Virtual Memory</a></li>
+      <li><a href="#t8"><span class="num">08</span>Disk Scheduling</a></li>
+      <li><a href="#t9"><span class="num">09</span>File Systems</a></li>
+    </ul>
+  </nav>
+
+  <main class="main" id="mainContent">
+    <div class="doc-header">
+      <div class="tag">Interview / Placement Notes</div>
+      <h1>Operating Systems</h1>
+      <p>Core OS concepts for placement interviews — theory, diagrams, worked examples, and a click-to-reveal MCQ quiz at the end of every section.</p>
+      <div class="pillars">
+        <span class="pillar-chip">Processes</span>
+        <span class="pillar-chip">Scheduling</span>
+        <span class="pillar-chip">Synchronization</span>
+        <span class="pillar-chip">Deadlocks</span>
+        <span class="pillar-chip">Memory</span>
+      </div>
+    </div>
+
+    <section class="topic" id="t1">
+  <div class="topic-head"><span class="idx">01</span><h2>Introduction to OS</h2></div>
+  <div class="theory">
+
+<p>An <strong>Operating System (OS)</strong> is system software that acts as an intermediary between computer hardware and the user, managing hardware resources and providing services for application programs.</p>
+
+<h3>Core Functions</h3>
+<ul>
+<li><strong>Process Management</strong> &mdash; creating, scheduling, and terminating processes.</li>
+<li><strong>Memory Management</strong> &mdash; allocating and deallocating memory space as needed.</li>
+<li><strong>File System Management</strong> &mdash; organizing and controlling access to files/directories.</li>
+<li><strong>Device Management</strong> &mdash; controlling I/O devices via drivers.</li>
+<li><strong>Security &amp; Access Control</strong> &mdash; protecting data and resources from unauthorized access.</li>
+</ul>
+
+<h3>Types of Operating Systems</h3>
+<table class="reftable">
+<tr><th>Type</th><th>Description</th><th>Example use case</th></tr>
+<tr><td>Batch OS</td><td>Jobs with similar needs are grouped and run as a batch, no direct user interaction during execution</td><td>Payroll processing, old mainframes</td></tr>
+<tr><td>Multiprogramming OS</td><td>Multiple programs reside in memory at once; CPU switches between them to maximize utilization</td><td>Early time-shared mainframes</td></tr>
+<tr><td>Time-Sharing OS</td><td>CPU time is divided into small slices (time quantum) shared among multiple users/processes, giving illusion of simultaneous execution</td><td>Multi-user Unix systems</td></tr>
+<tr><td>Multiprocessing OS</td><td>Two or more CPUs work together, sharing memory bus and peripherals, for increased throughput</td><td>Modern multi-core systems</td></tr>
+<tr><td>Real-Time OS (RTOS)</td><td>Guarantees processing within a strict, predictable time constraint (hard or soft real-time)</td><td>Pacemakers, industrial control systems</td></tr>
+<tr><td>Distributed OS</td><td>Manages a group of independent computers, making them appear as a single system to users</td><td>Google's distributed backends</td></tr>
+</table>
+
+<h3>Key Distinction: Multiprogramming vs Multitasking</h3>
+<p><strong>Multiprogramming</strong> focuses on maximizing CPU utilization by keeping multiple jobs in memory so the CPU always has something to execute (especially during I/O waits) &mdash; but from the user&rsquo;s perspective it isn&rsquo;t necessarily interactive. <strong>Multitasking</strong> is multiprogramming extended with rapid context switching (time-sharing) so users perceive several programs running <em>simultaneously</em>.</p>
+
+<div class="callout"><strong>Interview tip:</strong> A very common question is "OS as a resource manager vs OS as an extended machine." As a <strong>resource manager</strong>, the OS allocates CPU, memory, and I/O fairly and efficiently among competing processes. As an <strong>extended/virtual machine</strong>, the OS hides messy hardware details and gives programmers a clean, convenient abstraction (e.g., <code>read()</code>/<code>write()</code> instead of raw disk-controller instructions).</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">8 questions</span>
+  </div>
+  <div class="qcard" id="s1-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is the primary role of an Operating System?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q1')">
+      <span class="optletter">A</span><span>To compile source code into machine code</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q1')">
+      <span class="optletter">B</span><span>To act as an intermediary between hardware and user applications, managing resources</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q1')">
+      <span class="optletter">C</span><span>To provide internet connectivity only</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q1')">
+      <span class="optletter">D</span><span>To replace the need for application software</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The OS's core job is resource management and abstraction — it sits between raw hardware and the programs/users that need to use that hardware, handling CPU, memory, I/O, and files on their behalf.</div>
+  </div>
+<div class="qcard" id="s1-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>In a Batch Operating System, how are jobs typically processed?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q2')">
+      <span class="optletter">A</span><span>Jobs are processed one at a time with direct user interaction throughout</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q2')">
+      <span class="optletter">B</span><span>Similar jobs are grouped together and executed as a batch without user interaction during execution</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q2')">
+      <span class="optletter">C</span><span>Jobs are distributed across multiple independent computers</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q2')">
+      <span class="optletter">D</span><span>Jobs are guaranteed to finish within a fixed time deadline</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Batch OS groups jobs with similar requirements and runs them sequentially without user intervention during execution — this was common on early mainframes for things like payroll runs.</div>
+  </div>
+<div class="qcard" id="s1-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>Which OS type guarantees that a task will be completed within a strict, predictable time frame?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q3')">
+      <span class="optletter">A</span><span>Batch OS</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q3')">
+      <span class="optletter">B</span><span>Time-Sharing OS</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q3')">
+      <span class="optletter">C</span><span>Real-Time OS (RTOS)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q3')">
+      <span class="optletter">D</span><span>Distributed OS</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A Real-Time OS (RTOS) is defined by its timing guarantees — hard real-time systems (like pacemakers) must never miss a deadline, while soft real-time systems tolerate occasional misses.</div>
+  </div>
+<div class="qcard" id="s1-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What is the main difference between multiprogramming and multitasking?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q4')">
+      <span class="optletter">A</span><span>They are exactly the same concept with different names</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q4')">
+      <span class="optletter">B</span><span>Multiprogramming maximizes CPU utilization by keeping multiple jobs in memory; multitasking adds rapid context switching for perceived simultaneity to the user</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q4')">
+      <span class="optletter">C</span><span>Multitasking only works with a single CPU core, while multiprogramming requires multiple cores</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q4')">
+      <span class="optletter">D</span><span>Multiprogramming is used only in real-time systems</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Multiprogramming's goal is CPU utilization — never let the CPU sit idle when a job is waiting on I/O. Multitasking builds on this by rapidly time-slicing between programs so a user perceives them running at the same time.</div>
+  </div>
+<div class="qcard" id="s1-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>A Time-Sharing Operating System achieves the illusion of multiple users running programs simultaneously by:</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q5')">
+      <span class="optletter">A</span><span>Assigning a dedicated physical CPU to each user</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q5')">
+      <span class="optletter">B</span><span>Dividing CPU time into small slices (time quantum) and rapidly switching between processes</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q5')">
+      <span class="optletter">C</span><span>Running only one process until it fully completes before starting the next</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q5')">
+      <span class="optletter">D</span><span>Distributing processes across multiple physical machines</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Time-sharing divides CPU time into small quantums and cycles through processes/users so fast that each one appears to have continuous, exclusive access to the CPU.</div>
+  </div>
+<div class="qcard" id="s1-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>Which of these is NOT typically considered a core function of an Operating System?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q6')">
+      <span class="optletter">A</span><span>Process Management</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q6')">
+      <span class="optletter">B</span><span>Memory Management</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q6')">
+      <span class="optletter">C</span><span>Compiling high-level source code to an executable</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q6')">
+      <span class="optletter">D</span><span>File System Management</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Compiling code is the job of a compiler (application-level software), not the OS itself. The OS manages processes, memory, files, and devices — it doesn't translate source code.</div>
+  </div>
+<div class="qcard" id="s1-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>In a Multiprocessing OS, what characteristic distinguishes it from a single-CPU multiprogramming system?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q7')">
+      <span class="optletter">A</span><span>It uses two or more CPUs that share memory bus and peripherals to increase throughput</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q7')">
+      <span class="optletter">B</span><span>It can only run one process at a time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q7')">
+      <span class="optletter">C</span><span>It requires no memory management at all</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q7')">
+      <span class="optletter">D</span><span>It is exclusively used for batch processing</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Multiprocessing specifically refers to systems with multiple CPUs working together (often sharing memory), which increases throughput and provides fault tolerance compared to a single-CPU multiprogrammed system.</div>
+  </div>
+<div class="qcard" id="s1-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>A Distributed Operating System&#x27;s key goal is to:</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's1-q8')">
+      <span class="optletter">A</span><span>Make a group of independent, networked computers appear as a single coherent system to the user</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q8')">
+      <span class="optletter">B</span><span>Run only real-time critical tasks</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q8')">
+      <span class="optletter">C</span><span>Eliminate the need for a file system</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's1-q8')">
+      <span class="optletter">D</span><span>Process jobs strictly in a fixed batch order</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Distributed OS's defining feature is transparency — it coordinates multiple independent machines connected over a network so that, from the user's perspective, they behave like one unified system.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/8 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t2">
+  <div class="topic-head"><span class="idx">02</span><h2>Process Management</h2></div>
+  <div class="theory">
+
+<p>A <strong>process</strong> is a program in execution &mdash; it includes the program code, current activity (program counter, registers), a stack, a data section, and a heap.</p>
+
+<h3>Process vs Program</h3>
+<p>A <strong>program</strong> is a passive entity: static code sitting on disk. A <strong>process</strong> is an active entity: the program loaded into memory, with its own execution context and resources. The same program can spawn multiple independent processes.</p>
+
+<h3>Process States</h3>
+<div class="diagram">        admit           interrupt
+  New -----------> Ready <-----------+ 
+                     |  ^             |
+              dispatch|  |            |
+                     v  | scheduler   |
+                  Running              
+                     |  |            
+        I/O or event |  | I/O or event
+              wait   v  | completion
+                  Waiting -------------+
+
+                  Running --exit--> Terminated
+</div>
+<table class="reftable">
+<tr><th>State</th><th>Meaning</th></tr>
+<tr><td>New</td><td>Process is being created</td></tr>
+<tr><td>Ready</td><td>Process is waiting to be assigned to the CPU (in the ready queue)</td></tr>
+<tr><td>Running</td><td>Instructions are being executed by the CPU</td></tr>
+<tr><td>Waiting (Blocked)</td><td>Process is waiting for some event (I/O completion, signal) to occur</td></tr>
+<tr><td>Terminated</td><td>Process has finished execution</td></tr>
+</table>
+
+<h3>Process Control Block (PCB)</h3>
+<p>The OS represents each process with a <strong>PCB</strong> &mdash; a data structure holding all the information needed to manage the process:</p>
+<ul>
+<li>Process ID (PID), process state</li>
+<li>Program Counter (address of next instruction)</li>
+<li>CPU registers, CPU scheduling info (priority)</li>
+<li>Memory management info (page tables, base/limit registers)</li>
+<li>Accounting info, I/O status info (open files, allocated devices)</li>
+</ul>
+
+<h3>Schedulers</h3>
+<table class="reftable">
+<tr><th>Scheduler</th><th>Role</th><th>Frequency</th></tr>
+<tr><td>Long-term (Job Scheduler)</td><td>Selects which processes are brought into the ready queue from disk (controls degree of multiprogramming)</td><td>Runs infrequently (seconds/minutes)</td></tr>
+<tr><td>Short-term (CPU Scheduler)</td><td>Selects which ready process gets the CPU next</td><td>Runs very frequently (milliseconds)</td></tr>
+<tr><td>Medium-term Scheduler</td><td>Swaps processes in/out of memory to manage the degree of multiprogramming (swapping)</td><td>Runs occasionally, as needed</td></tr>
+</table>
+
+<h3>Context Switching</h3>
+<p>A <strong>context switch</strong> is the act of saving the state (PCB) of the currently running process and loading the saved state of the next process to run. It is pure overhead &mdash; no useful work is done during the switch itself &mdash; so minimizing context switch time is a scheduling design goal.</p>
+
+<h3>Process Creation: fork() (Unix/Linux)</h3>
+<div class="diagram">#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+int main() {
+    int pid = fork();       // creates a child process (a copy of the parent)
+
+    if (pid == 0) {
+        printf("Child process\n");     // pid==0 only in the CHILD
+    } else if (pid > 0) {
+        printf("Parent process, child PID = %d\n", pid);  // pid = child's PID in PARENT
+    } else {
+        printf("fork failed\n");
+    }
+    return 0;
+}</div>
+<p><code>fork()</code> returns twice: <strong>0</strong> in the child process, and the <strong>child&rsquo;s PID</strong> in the parent process. If a program calls <code>fork()</code> <em>n</em> times, it creates <strong>2<sup>n</sup></strong> total processes (including the original).</p>
+
+<div class="callout warn"><strong>Common gotcha:</strong> after <code>fork()</code>, both parent and child continue executing from the <em>same point</em> in the code &mdash; the line right after the fork call &mdash; not from the beginning of <code>main()</code>.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s2-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is the key difference between a program and a process?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q1')">
+      <span class="optletter">A</span><span>A program is written in a high-level language; a process is always in machine code</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q1')">
+      <span class="optletter">B</span><span>A program is a passive set of instructions on disk; a process is an active entity with its own execution context</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q1')">
+      <span class="optletter">C</span><span>A process cannot be created from a program</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q1')">
+      <span class="optletter">D</span><span>There is no difference — the terms are interchangeable</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A program is static code sitting on disk. A process is that program loaded into memory and actively executing, with its own PC, registers, stack, and resources.</div>
+  </div>
+<div class="qcard" id="s2-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>Which process state indicates that a process is waiting only for CPU availability (not for I/O)?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q2')">
+      <span class="optletter">A</span><span>New</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q2')">
+      <span class="optletter">B</span><span>Ready</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q2')">
+      <span class="optletter">C</span><span>Running</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q2')">
+      <span class="optletter">D</span><span>Waiting/Blocked</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Ready means the process has everything it needs except the CPU — it's sitting in the ready queue waiting to be dispatched by the scheduler. Waiting/Blocked specifically means it's stalled on an event like I/O.</div>
+  </div>
+<div class="qcard" id="s2-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>What does a Process Control Block (PCB) store?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q3')">
+      <span class="optletter">A</span><span>Only the process&#x27;s final output</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q3')">
+      <span class="optletter">B</span><span>Process state, program counter, CPU registers, memory management info, and I/O status</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q3')">
+      <span class="optletter">C</span><span>The source code of the compiler</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q3')">
+      <span class="optletter">D</span><span>A list of all other processes in the system only</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The PCB is the OS's per-process bookkeeping structure — it holds everything needed to pause and later correctly resume a process: state, PC, registers, memory info, and I/O/accounting details.</div>
+  </div>
+<div class="qcard" id="s2-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>Which scheduler controls the degree of multiprogramming by deciding which jobs are admitted into the ready queue?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q4')">
+      <span class="optletter">A</span><span>Short-term scheduler</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q4')">
+      <span class="optletter">B</span><span>Medium-term scheduler</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q4')">
+      <span class="optletter">C</span><span>Long-term scheduler</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q4')">
+      <span class="optletter">D</span><span>I/O scheduler</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The long-term (job) scheduler decides which jobs from the disk/job pool get loaded into memory as processes, directly controlling how many processes compete for the CPU (the degree of multiprogramming).</div>
+  </div>
+<div class="qcard" id="s2-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>Why is a context switch considered pure overhead?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q5')">
+      <span class="optletter">A</span><span>It executes a useful instruction for the next process</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q5')">
+      <span class="optletter">B</span><span>No useful computation happens during the switch itself — it&#x27;s just saving/restoring state</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q5')">
+      <span class="optletter">C</span><span>It always crashes the running process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q5')">
+      <span class="optletter">D</span><span>It only happens once per program&#x27;s lifetime</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>During a context switch, the CPU is busy saving the old process's PCB and loading the new one's — no actual user-facing computation happens in that window, so it's overhead the OS tries to minimize.</div>
+  </div>
+<div class="qcard" id="s2-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>In the C code `int pid = fork();`, what does `pid == 0` indicate?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q6')">
+      <span class="optletter">A</span><span>The fork() call failed</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q6')">
+      <span class="optletter">B</span><span>This code is executing in the child process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q6')">
+      <span class="optletter">C</span><span>This code is executing in the parent process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q6')">
+      <span class="optletter">D</span><span>The child process has already terminated</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>fork() returns 0 specifically in the child process. In the parent process, it returns the child's actual PID (a positive number). A negative return value indicates failure.</div>
+  </div>
+<div class="qcard" id="s2-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>If a program calls fork() three times in sequence (with no conditional branching based on pid), how many total processes exist afterward?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q7')">
+      <span class="optletter">A</span><span>3</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q7')">
+      <span class="optletter">B</span><span>4</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q7')">
+      <span class="optletter">C</span><span>6</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q7')">
+      <span class="optletter">D</span><span>8</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Each fork() call doubles the number of processes, since every existing process (parent and all children so far) calls fork() again. After 3 calls: 2^3 = 8 total processes.</div>
+  </div>
+<div class="qcard" id="s2-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>What is the role of the medium-term scheduler?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q8')">
+      <span class="optletter">A</span><span>It compiles the process&#x27;s source code</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q8')">
+      <span class="optletter">B</span><span>It swaps processes in and out of main memory to adjust the degree of multiprogramming</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q8')">
+      <span class="optletter">C</span><span>It assigns process IDs</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q8')">
+      <span class="optletter">D</span><span>It only runs once at system boot</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The medium-term scheduler temporarily removes (swaps out) processes from memory to reduce the multiprogramming load, and later swaps them back in — useful when memory is overcommitted.</div>
+  </div>
+<div class="qcard" id="s2-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>After a fork() call in Unix, from which point does the child process begin execution?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q9')">
+      <span class="optletter">A</span><span>From the very beginning of main()</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q9')">
+      <span class="optletter">B</span><span>From the instruction immediately after the fork() call, same as the parent</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q9')">
+      <span class="optletter">C</span><span>From a randomly chosen instruction</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q9')">
+      <span class="optletter">D</span><span>The child does not execute any code</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Both parent and child resume execution right after the fork() call — they share the same code from that point onward, differentiated only by the return value of fork() (0 vs child PID).</div>
+  </div>
+<div class="qcard" id="s2-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>Which of the following is TRUE about the short-term (CPU) scheduler?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q10')">
+      <span class="optletter">A</span><span>It runs only once per minute</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's2-q10')">
+      <span class="optletter">B</span><span>It runs very frequently, selecting which ready process gets the CPU next</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q10')">
+      <span class="optletter">C</span><span>It decides which jobs are admitted from disk into memory</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's2-q10')">
+      <span class="optletter">D</span><span>It is responsible for swapping entire processes out of memory</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The short-term scheduler operates at a very high frequency (often every few milliseconds) to pick the next process from the ready queue to actually run on the CPU — this is the core of CPU scheduling algorithms like Round Robin, SJF, etc.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t3">
+  <div class="topic-head"><span class="idx">03</span><h2>CPU Scheduling</h2></div>
+  <div class="theory">
+
+<p><strong>CPU Scheduling</strong> decides which process in the ready queue gets the CPU next, aiming to maximize utilization and throughput while minimizing waiting and response time.</p>
+
+<h3>Key Scheduling Metrics</h3>
+<table class="reftable">
+<tr><th>Metric</th><th>Formula</th></tr>
+<tr><td>Completion Time (CT)</td><td>Time at which a process finishes execution</td></tr>
+<tr><td>Turnaround Time (TAT)</td><td>CT &minus; Arrival Time</td></tr>
+<tr><td>Waiting Time (WT)</td><td>TAT &minus; Burst Time</td></tr>
+<tr><td>Response Time (RT)</td><td>Time of first CPU allocation &minus; Arrival Time</td></tr>
+</table>
+
+<h3>1. First Come First Serve (FCFS)</h3>
+<p>Processes are executed strictly in order of arrival, non-preemptive. Simple but suffers from the <strong>convoy effect</strong>: a long process at the front makes all shorter processes behind it wait unnecessarily long.</p>
+<div class="diagram">Example: P1(burst=24), P2(burst=3), P3(burst=3), all arrive at t=0
+
+Gantt Chart:  | P1 (0-24) | P2 (24-27) | P3 (27-30) |
+
+WT(P1)=0, WT(P2)=24, WT(P3)=27  ->  Average WT = 17
+(Convoy effect: P2 and P3 are stuck waiting behind the long P1)</div>
+
+<h3>2. Shortest Job First (SJF)</h3>
+<p>Picks the process with the smallest burst time next. Non-preemptive by default. Provably gives the <strong>minimum average waiting time</strong> among non-preemptive algorithms &mdash; but requires knowing burst times in advance (often predicted via exponential averaging) and can cause <strong>starvation</strong> for long processes.</p>
+
+<h3>3. Shortest Remaining Time First (SRTF)</h3>
+<p>The preemptive version of SJF &mdash; if a new process arrives with a burst time shorter than the remaining time of the currently running process, the CPU is preempted immediately. Optimal for minimizing average waiting time, but incurs more context-switch overhead and can still starve long processes.</p>
+
+<h3>4. Round Robin (RR)</h3>
+<p>Each process gets a fixed time slice (<strong>time quantum</strong>); if it doesn&rsquo;t finish, it goes to the back of the ready queue. Preemptive and fair &mdash; ideal for time-sharing systems.</p>
+<div class="diagram">Example: P1(burst=5), P2(burst=4), quantum=2
+
+Gantt Chart: | P1(0-2) | P2(2-4) | P1(4-7) | P2(7-8) |
+
+Note: if quantum is TOO LARGE -> behaves like FCFS
+      if quantum is TOO SMALL -> excessive context-switch overhead</div>
+
+<h3>5. Priority Scheduling</h3>
+<p>Each process is assigned a priority; the CPU is given to the highest-priority ready process. Can be preemptive or non-preemptive. Risk: <strong>starvation</strong> of low-priority processes &mdash; solved using <strong>aging</strong> (gradually increasing the priority of processes that wait too long).</p>
+
+<h3>Preemptive vs Non-Preemptive</h3>
+<table class="reftable">
+<tr><th></th><th>Non-Preemptive</th><th>Preemptive</th></tr>
+<tr><td>Definition</td><td>Once CPU is given to a process, it keeps it until it finishes or blocks on I/O</td><td>CPU can be forcibly taken away and given to another process</td></tr>
+<tr><td>Examples</td><td>FCFS, non-preemptive SJF</td><td>SRTF, Round Robin, preemptive Priority</td></tr>
+<tr><td>Overhead</td><td>Lower (fewer context switches)</td><td>Higher (more context switches) but more responsive</td></tr>
+</table>
+
+<div class="callout"><strong>Interview tip:</strong> If asked to compute average waiting/turnaround time, always draw the Gantt chart first — most mistakes come from misordering execution, not from the arithmetic.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s3-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is the formula for Turnaround Time (TAT)?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q1')">
+      <span class="optletter">A</span><span>Completion Time + Arrival Time</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q1')">
+      <span class="optletter">B</span><span>Completion Time − Arrival Time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q1')">
+      <span class="optletter">C</span><span>Completion Time − Burst Time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q1')">
+      <span class="optletter">D</span><span>Arrival Time − Burst Time</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Turnaround Time measures the total time from when a process arrives to when it finishes, so it's Completion Time minus Arrival Time.</div>
+  </div>
+<div class="qcard" id="s3-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>Which scheduling algorithm suffers most notably from the &#x27;convoy effect&#x27;?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q2')">
+      <span class="optletter">A</span><span>Round Robin</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q2')">
+      <span class="optletter">B</span><span>First Come First Serve (FCFS)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q2')">
+      <span class="optletter">C</span><span>Shortest Remaining Time First (SRTF)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q2')">
+      <span class="optletter">D</span><span>Priority Scheduling with aging</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>FCFS is non-preemptive and strictly order-based, so if a long process arrives first, all shorter processes behind it are forced to wait — this pile-up is the classic convoy effect.</div>
+  </div>
+<div class="qcard" id="s3-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>Which algorithm provably gives the minimum average waiting time among non-preemptive scheduling algorithms?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q3')">
+      <span class="optletter">A</span><span>FCFS</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q3')">
+      <span class="optletter">B</span><span>Round Robin</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q3')">
+      <span class="optletter">C</span><span>Shortest Job First (SJF)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q3')">
+      <span class="optletter">D</span><span>SRTF (since it&#x27;s non-preemptive too)</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>SJF (non-preemptive) is proven optimal for minimizing average waiting time when compared among non-preemptive algorithms, precisely because it always tackles the shortest available job next.</div>
+  </div>
+<div class="qcard" id="s3-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What is the main risk of using Shortest Job First (SJF) or SRTF scheduling?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q4')">
+      <span class="optletter">A</span><span>High memory usage only</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q4')">
+      <span class="optletter">B</span><span>Starvation of longer processes if short processes keep arriving</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q4')">
+      <span class="optletter">C</span><span>It cannot be implemented on multi-core systems</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q4')">
+      <span class="optletter">D</span><span>It always requires more memory than FCFS</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because SJF/SRTF always favor the shortest job, a steady stream of short processes can indefinitely delay a long process — this is starvation.</div>
+  </div>
+<div class="qcard" id="s3-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>In Round Robin scheduling, what happens if the time quantum is set far too large?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q5')">
+      <span class="optletter">A</span><span>The system crashes</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q5')">
+      <span class="optletter">B</span><span>It effectively behaves like FCFS</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q5')">
+      <span class="optletter">C</span><span>It becomes equivalent to SJF</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q5')">
+      <span class="optletter">D</span><span>Context switch overhead becomes extremely high</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>If the quantum is larger than any process's burst time, each process finishes within its first turn — meaning no process is ever preempted, which behaves identically to FCFS.</div>
+  </div>
+<div class="qcard" id="s3-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What technique is commonly used to prevent starvation in Priority Scheduling?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q6')">
+      <span class="optletter">A</span><span>Reducing the number of processes</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q6')">
+      <span class="optletter">B</span><span>Aging — gradually increasing the priority of processes that have waited a long time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q6')">
+      <span class="optletter">C</span><span>Switching to FCFS permanently</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q6')">
+      <span class="optletter">D</span><span>Disabling the ready queue</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Aging solves starvation by incrementally boosting a waiting process's priority the longer it waits, eventually guaranteeing it gets scheduled.</div>
+  </div>
+<div class="qcard" id="s3-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>Which of the following is a preemptive scheduling algorithm?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q7')">
+      <span class="optletter">A</span><span>FCFS</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q7')">
+      <span class="optletter">B</span><span>Non-preemptive SJF</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q7')">
+      <span class="optletter">C</span><span>Round Robin</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q7')">
+      <span class="optletter">D</span><span>None of these are ever preemptive</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Round Robin is inherently preemptive — each process is interrupted when its time quantum expires, even if it hasn't finished, and placed back in the ready queue.</div>
+  </div>
+<div class="qcard" id="s3-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>Given P1(burst=24) and P2(burst=3) both arriving at t=0, executed via FCFS in order P1 then P2, what is P2&#x27;s waiting time?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q8')">
+      <span class="optletter">A</span><span>0</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q8')">
+      <span class="optletter">B</span><span>3</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q8')">
+      <span class="optletter">C</span><span>24</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q8')">
+      <span class="optletter">D</span><span>27</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>In FCFS with P1 first, P1 runs from 0-24. P2 must wait the entire time P1 runs before it even starts, so its waiting time equals P1's burst time: 24.</div>
+  </div>
+<div class="qcard" id="s3-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>What is Response Time in CPU scheduling?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q9')">
+      <span class="optletter">A</span><span>Completion Time − Arrival Time</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q9')">
+      <span class="optletter">B</span><span>The time between a process&#x27;s arrival and its very first allocation of the CPU</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q9')">
+      <span class="optletter">C</span><span>The total burst time of a process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q9')">
+      <span class="optletter">D</span><span>The time it takes for a process to fully terminate</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Response Time specifically measures how long a process waits before it is FIRST given the CPU — important for interactive/time-sharing systems where quick initial response matters, distinct from total turnaround.</div>
+  </div>
+<div class="qcard" id="s3-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>Why does SRTF generally have more overhead compared to non-preemptive SJF?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q10')">
+      <span class="optletter">A</span><span>It requires more memory to store burst times</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's3-q10')">
+      <span class="optletter">B</span><span>It requires more context switches since the running process can be preempted whenever a shorter job arrives</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q10')">
+      <span class="optletter">C</span><span>It cannot handle multiple processes</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's3-q10')">
+      <span class="optletter">D</span><span>It never actually completes any process</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because SRTF re-evaluates the shortest remaining time on every new arrival and can preempt the currently running process, it triggers many more context switches than non-preemptive SJF, which never interrupts a running process once started.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t4">
+  <div class="topic-head"><span class="idx">04</span><h2>Process Synchronization</h2></div>
+  <div class="theory">
+
+<p><strong>Process Synchronization</strong> deals with coordinating concurrent processes/threads that share resources, to avoid inconsistent results.</p>
+
+<h3>Race Condition</h3>
+<p>A <strong>race condition</strong> occurs when multiple processes/threads access and modify shared data concurrently, and the final result depends on the unpredictable timing/order of execution.</p>
+<div class="diagram">Example: two threads both execute "counter++" on a shared variable counter=5
+
+Thread A reads counter (5)
+Thread B reads counter (5)      <- both read the SAME stale value
+Thread A writes counter+1 (6)
+Thread B writes counter+1 (6)   <- one increment is LOST! Expected 7, got 6</div>
+
+<h3>Critical Section Problem</h3>
+<p>The <strong>critical section</strong> is the part of code where shared resources are accessed. A correct solution must satisfy:</p>
+<ul>
+<li><strong>Mutual Exclusion</strong> &mdash; no two processes can be in their critical section at the same time.</li>
+<li><strong>Progress</strong> &mdash; if no process is in the critical section, one of the processes wishing to enter must be able to, without indefinite postponement.</li>
+<li><strong>Bounded Waiting</strong> &mdash; there must be a limit on how many times other processes can enter their critical section before a waiting process gets its turn.</li>
+</ul>
+
+<h3>Semaphores</h3>
+<p>A <strong>semaphore</strong> is an integer variable accessed only through two atomic operations: <code>wait()</code> (P, decrements) and <code>signal()</code> (V, increments).</p>
+<div class="diagram">wait(S) {           signal(S) {
+  while (S <= 0)      S++;
+    ; // busy wait   }
+  S--;
+}</div>
+<table class="reftable">
+<tr><th>Type</th><th>Description</th></tr>
+<tr><td>Binary Semaphore (Mutex)</td><td>Value restricted to 0 or 1 &mdash; used for mutual exclusion (lock/unlock)</td></tr>
+<tr><td>Counting Semaphore</td><td>Value can range over an unrestricted domain &mdash; used to control access to a resource with multiple instances (e.g., a pool of N identical printers)</td></tr>
+</table>
+
+<h3>Mutex vs Semaphore (classic interview question)</h3>
+<table class="reftable">
+<tr><th></th><th>Mutex</th><th>Semaphore</th></tr>
+<tr><td>Purpose</td><td>Locking mechanism, mutual exclusion only</td><td>Signaling mechanism, can allow N processes access</td></tr>
+<tr><td>Ownership</td><td>Only the thread that locked it can unlock it</td><td>Any process/thread can signal, regardless of who waited</td></tr>
+<tr><td>Value range</td><td>Binary (locked/unlocked)</td><td>Can be binary or counting (integer)</td></tr>
+</table>
+
+<h3>Classic Synchronization Problems</h3>
+<ul>
+<li><strong>Producer-Consumer Problem</strong> &mdash; producers add items to a shared bounded buffer, consumers remove them; must avoid producing into a full buffer or consuming from an empty one. Solved using two counting semaphores (<code>empty</code>, <code>full</code>) plus a mutex.</li>
+<li><strong>Reader-Writer Problem</strong> &mdash; multiple readers can read shared data simultaneously, but a writer needs exclusive access (no readers or other writers).</li>
+<li><strong>Dining Philosophers Problem</strong> &mdash; models resource contention/deadlock: N philosophers alternate between thinking and eating, needing two shared forks to eat, illustrating deadlock and starvation risks in concurrent resource allocation.</li>
+</ul>
+
+<h3>Peterson&rsquo;s Solution</h3>
+<p>A classic software-only solution to the critical section problem for two processes, using a <code>turn</code> variable and a <code>flag[]</code> array to enforce mutual exclusion, progress, and bounded waiting without hardware support. (Note: not reliable on modern hardware with instruction reordering / compiler optimizations without additional memory barriers.)</p>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s4-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is a race condition?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q1')">
+      <span class="optletter">A</span><span>When a process runs faster than the OS expects</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q1')">
+      <span class="optletter">B</span><span>When multiple processes/threads access shared data concurrently and the outcome depends on unpredictable execution timing</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q1')">
+      <span class="optletter">C</span><span>When a process is starved of CPU time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q1')">
+      <span class="optletter">D</span><span>When two processes deadlock waiting on each other</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A race condition specifically arises when the final result of concurrent operations on shared data depends on the order/timing of execution — classic symptom: lost updates, like two threads incrementing a shared counter and one increment getting overwritten.</div>
+  </div>
+<div class="qcard" id="s4-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>Which of these is NOT one of the three required conditions for a correct critical section solution?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q2')">
+      <span class="optletter">A</span><span>Mutual Exclusion</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q2')">
+      <span class="optletter">B</span><span>Progress</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q2')">
+      <span class="optletter">C</span><span>Bounded Waiting</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q2')">
+      <span class="optletter">D</span><span>Maximum Throughput</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The three required properties are Mutual Exclusion, Progress, and Bounded Waiting. Maximum throughput is a performance goal, not a correctness requirement of the critical section problem.</div>
+  </div>
+<div class="qcard" id="s4-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>What does the wait() (P) operation do to a semaphore?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q3')">
+      <span class="optletter">A</span><span>Increments the semaphore value</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q3')">
+      <span class="optletter">B</span><span>Decrements the semaphore value (blocking if it becomes negative/zero)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q3')">
+      <span class="optletter">C</span><span>Resets the semaphore to its initial value</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q3')">
+      <span class="optletter">D</span><span>Deletes the semaphore</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>wait() (also called P, from Dutch 'proberen') decrements the semaphore. If the value would go below zero (in blocking implementations) or is already zero, the calling process waits/blocks.</div>
+  </div>
+<div class="qcard" id="s4-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What is the key difference between a binary semaphore and a mutex?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q4')">
+      <span class="optletter">A</span><span>They are functionally identical in every implementation and use case</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q4')">
+      <span class="optletter">B</span><span>A mutex has ownership — only the locking thread can unlock it — while a semaphore has no such ownership restriction</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q4')">
+      <span class="optletter">C</span><span>A mutex can only be used by one process ever, for its entire lifetime</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q4')">
+      <span class="optletter">D</span><span>Semaphores can never be binary</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>While both restrict access to 0/1 in the binary case, a mutex enforces ownership (only the thread that acquired the lock can release it), whereas a semaphore can be signaled by any thread/process, regardless of who performed the wait.</div>
+  </div>
+<div class="qcard" id="s4-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>In the Producer-Consumer problem using semaphores, what is the purpose of the &#x27;empty&#x27; and &#x27;full&#x27; counting semaphores?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q5')">
+      <span class="optletter">A</span><span>To track how many readers vs writers are active</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q5')">
+      <span class="optletter">B</span><span>To track the number of empty slots and filled slots in the shared bounded buffer</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q5')">
+      <span class="optletter">C</span><span>To prevent the producer from ever running</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q5')">
+      <span class="optletter">D</span><span>To count how many times a deadlock has occurred</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The 'empty' semaphore tracks available empty slots (producer waits on this before adding), and 'full' tracks filled slots (consumer waits on this before removing) — together with a mutex they prevent overproduction into a full buffer or consuming from an empty one.</div>
+  </div>
+<div class="qcard" id="s4-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What is the central challenge illustrated by the Dining Philosophers problem?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q6')">
+      <span class="optletter">A</span><span>How to compile shared library code</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q6')">
+      <span class="optletter">B</span><span>Resource contention and the risk of deadlock/starvation when multiple processes compete for shared resources (forks)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q6')">
+      <span class="optletter">C</span><span>How to schedule I/O-bound processes only</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q6')">
+      <span class="optletter">D</span><span>How memory paging works</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Dining Philosophers models N processes each needing two shared resources (forks) to proceed — if everyone grabs their left fork simultaneously, all wait forever for their right fork, illustrating deadlock and starvation risks in concurrent systems.</div>
+  </div>
+<div class="qcard" id="s4-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>In the Reader-Writer problem, which of the following access patterns is allowed?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q7')">
+      <span class="optletter">A</span><span>Multiple writers writing at the same time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q7')">
+      <span class="optletter">B</span><span>One writer and one reader accessing simultaneously</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q7')">
+      <span class="optletter">C</span><span>Multiple readers reading simultaneously (with no writer active)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q7')">
+      <span class="optletter">D</span><span>A reader and writer are always treated identically with no special rules</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Since reads don't modify data, multiple readers can safely access shared data concurrently. But a writer requires fully exclusive access — no readers or other writers can be active during a write.</div>
+  </div>
+<div class="qcard" id="s4-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>What does Peterson&#x27;s Solution use to achieve mutual exclusion for two processes?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q8')">
+      <span class="optletter">A</span><span>A hardware-based test-and-set instruction only</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q8')">
+      <span class="optletter">B</span><span>A &#x27;turn&#x27; variable and a &#x27;flag[]&#x27; array, entirely in software</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q8')">
+      <span class="optletter">C</span><span>A single semaphore initialized to 2</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q8')">
+      <span class="optletter">D</span><span>Random delays between process executions</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Peterson's Solution is a purely software-based algorithm using a shared 'turn' variable (whose turn it is) and a 'flag' array (who wants to enter), without needing any special hardware instructions — though it's not fully reliable on modern hardware without memory barriers.</div>
+  </div>
+<div class="qcard" id="s4-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>A counting semaphore would be most appropriate for managing access to:</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q9')">
+      <span class="optletter">A</span><span>A single resource that only one process can use at a time</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q9')">
+      <span class="optletter">B</span><span>A pool of N identical resources (e.g., N available printer connections)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q9')">
+      <span class="optletter">C</span><span>A variable that must always remain read-only</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q9')">
+      <span class="optletter">D</span><span>A process&#x27;s program counter</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Counting semaphores generalize beyond binary lock/unlock — they're ideal when there are multiple (N) interchangeable instances of a resource, allowing up to N processes concurrent access before others must wait.</div>
+  </div>
+<div class="qcard" id="s4-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>What lost-update scenario best illustrates why a race condition is problematic?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's4-q10')">
+      <span class="optletter">A</span><span>Two threads both reading a stale value of a shared counter before either writes back, causing one increment to be overwritten</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q10')">
+      <span class="optletter">B</span><span>A single thread executing sequential instructions with no other threads involved</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q10')">
+      <span class="optletter">C</span><span>A process that never accesses shared memory</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's4-q10')">
+      <span class="optletter">D</span><span>A process that always runs to completion before any other process starts</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The classic race condition example: if two threads read the same stale value of a shared counter before either writes back their incremented result, one thread's update effectively gets silently lost.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t5">
+  <div class="topic-head"><span class="idx">05</span><h2>Deadlocks</h2></div>
+  <div class="theory">
+
+<p>A <strong>deadlock</strong> is a situation where a set of processes are blocked, each holding a resource and waiting to acquire a resource held by another process in the set &mdash; forming a cycle with no process able to proceed.</p>
+
+<h3>Four Necessary Conditions (Coffman Conditions)</h3>
+<p>All four must hold simultaneously for a deadlock to occur:</p>
+<table class="reftable">
+<tr><th>Condition</th><th>Meaning</th></tr>
+<tr><td>Mutual Exclusion</td><td>At least one resource must be held in a non-shareable mode</td></tr>
+<tr><td>Hold and Wait</td><td>A process holding at least one resource is waiting to acquire additional resources held by others</td></tr>
+<tr><td>No Preemption</td><td>Resources cannot be forcibly taken away from a process; only voluntarily released</td></tr>
+<tr><td>Circular Wait</td><td>A set of processes {P0, P1, ..., Pn} exists such that P0 waits for a resource held by P1, P1 waits for P2, ..., Pn waits for P0</td></tr>
+</table>
+
+<h3>Resource Allocation Graph (RAG)</h3>
+<div class="diagram">Notation:  P1 -> R1  means "P1 is requesting R1"
+           R1 -> P1  means "R1 is allocated to P1"
+
+Example showing a deadlock (cycle):
+
+   P1 ---request---> R1 ---allocated---> P2
+    ^                                     |
+    |                                request
+    |                                     v
+   R2 <---allocated--- (assigned to P1)  R2
+
+If a cycle exists in a RAG WITH single-instance resources -> deadlock is guaranteed.
+If resources have multiple instances, a cycle is necessary but NOT sufficient for deadlock.</div>
+
+<h3>Deadlock Handling Strategies</h3>
+<table class="reftable">
+<tr><th>Strategy</th><th>Approach</th></tr>
+<tr><td>Prevention</td><td>Design the system so at least one of the four Coffman conditions can never hold (e.g., request all resources at once to break Hold-and-Wait)</td></tr>
+<tr><td>Avoidance</td><td>Grant resource requests only if the resulting state is "safe" (won't lead to deadlock) &mdash; uses algorithms like Banker's Algorithm</td></tr>
+<tr><td>Detection &amp; Recovery</td><td>Allow deadlocks to occur, periodically check for cycles/deadlock via algorithms, then recover (kill a process or preempt a resource)</td></tr>
+<tr><td>Ignorance (Ostrich Algorithm)</td><td>Assume deadlocks are rare enough to ignore &mdash; used by many general-purpose OSes like Unix/Windows for simplicity</td></tr>
+</table>
+
+<h3>Banker&rsquo;s Algorithm</h3>
+<p>An avoidance algorithm that simulates resource allocation before actually granting it, checking whether the system remains in a <strong>safe state</strong> (there exists some order in which all processes can finish without deadlock). Requires the OS to know the maximum resource demand of each process in advance.</p>
+<div class="diagram">Core idea:
+1. Process requests resources.
+2. OS pretends to grant the request.
+3. Check if a SAFE SEQUENCE still exists (i.e. some order lets every
+   process finish using currently available + eventually released resources).
+4. If yes -> actually grant the request.
+   If no  -> process must wait (request is rolled back).</div>
+
+<h3>Safe State vs Unsafe State</h3>
+<p>A <strong>safe state</strong> is one where the system can allocate resources to each process (up to its max demand) in <em>some</em> order and avoid deadlock. An <strong>unsafe state</strong> does not necessarily mean deadlock has occurred &mdash; but it means there is a possibility of deadlock, since no safe sequence can be guaranteed.</p>
+
+<div class="callout warn"><strong>Common confusion:</strong> Unsafe state &ne; deadlock. All deadlocked states are unsafe, but not all unsafe states lead to deadlock — the OS is just being conservative by refusing to enter an unsafe state.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s5-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>Which of the following is NOT one of the four Coffman conditions necessary for deadlock?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q1')">
+      <span class="optletter">A</span><span>Mutual Exclusion</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q1')">
+      <span class="optletter">B</span><span>Hold and Wait</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q1')">
+      <span class="optletter">C</span><span>Preemption</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q1')">
+      <span class="optletter">D</span><span>Circular Wait</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The actual condition is 'No Preemption' (resources cannot be forcibly taken away) — the presence of preemption capability would actually help PREVENT deadlock, not cause it.</div>
+  </div>
+<div class="qcard" id="s5-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>For deadlock to occur, how many of the four Coffman conditions must hold simultaneously?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q2')">
+      <span class="optletter">A</span><span>Any one is sufficient</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q2')">
+      <span class="optletter">B</span><span>At least two</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q2')">
+      <span class="optletter">C</span><span>All four</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q2')">
+      <span class="optletter">D</span><span>None — deadlock can occur with zero conditions met</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>All four conditions (Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait) must hold simultaneously for deadlock to be possible. Breaking even one of them prevents deadlock.</div>
+  </div>
+<div class="qcard" id="s5-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>In a Resource Allocation Graph with only single-instance resource types, what does a cycle indicate?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q3')">
+      <span class="optletter">A</span><span>Nothing significant — cycles are normal and harmless</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q3')">
+      <span class="optletter">B</span><span>A cycle guarantees a deadlock exists</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q3')">
+      <span class="optletter">C</span><span>A cycle means the system will crash immediately</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q3')">
+      <span class="optletter">D</span><span>A cycle indicates the process finished successfully</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>With single-instance resources, a cycle in the RAG is both necessary AND sufficient for deadlock — its presence guarantees a deadlock. This is not true when resources have multiple instances, where a cycle is necessary but not sufficient.</div>
+  </div>
+<div class="qcard" id="s5-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What is the main idea behind the &#x27;Ostrich Algorithm&#x27; approach to deadlocks?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q4')">
+      <span class="optletter">A</span><span>Aggressively detect and kill deadlocked processes every second</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q4')">
+      <span class="optletter">B</span><span>Assume deadlocks are rare enough to simply ignore, as done by many general-purpose OSes</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q4')">
+      <span class="optletter">C</span><span>Prevent all four Coffman conditions strictly at all times</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q4')">
+      <span class="optletter">D</span><span>Use the Banker&#x27;s Algorithm exclusively</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The Ostrich Algorithm 'buries its head in the sand' — it assumes deadlocks occur infrequently enough that it's not worth the overhead of prevention/avoidance/detection. Many general-purpose systems like Unix and Windows take this pragmatic approach.</div>
+  </div>
+<div class="qcard" id="s5-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>What must the OS know in advance to run the Banker&#x27;s Algorithm?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q5')">
+      <span class="optletter">A</span><span>The exact CPU scheduling algorithm in use</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q5')">
+      <span class="optletter">B</span><span>The maximum resource demand of each process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q5')">
+      <span class="optletter">C</span><span>The process&#x27;s program counter value</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q5')">
+      <span class="optletter">D</span><span>The total number of context switches that will occur</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Banker's Algorithm requires each process to declare its maximum possible resource need upfront, so the OS can simulate whether granting a request keeps the system in a safe state.</div>
+  </div>
+<div class="qcard" id="s5-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What does it mean for a system to be in a &#x27;safe state&#x27;?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q6')">
+      <span class="optletter">A</span><span>No process is currently running</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q6')">
+      <span class="optletter">B</span><span>There exists at least one order in which all processes can complete without leading to deadlock</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q6')">
+      <span class="optletter">C</span><span>All resources are currently free</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q6')">
+      <span class="optletter">D</span><span>A deadlock has already occurred but was recovered from</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A safe state means there's a guaranteed sequence in which every process can eventually get all the resources it needs (up to its max) and finish, without ever hitting deadlock — even if not all resources are free right now.</div>
+  </div>
+<div class="qcard" id="s5-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>Is an &#x27;unsafe state&#x27; the same as a deadlocked state?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q7')">
+      <span class="optletter">A</span><span>Yes, they are always identical</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q7')">
+      <span class="optletter">B</span><span>No — an unsafe state only means deadlock is POSSIBLE, not that it has occurred</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q7')">
+      <span class="optletter">C</span><span>Unsafe state is strictly less dangerous than a safe state</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q7')">
+      <span class="optletter">D</span><span>Unsafe state only applies to single-threaded programs</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>This is a classic point of confusion: an unsafe state means there's no guaranteed safe sequence, so deadlock COULD happen — but it doesn't mean deadlock has definitely occurred. All deadlocks are unsafe states, but not all unsafe states become deadlocks.</div>
+  </div>
+<div class="qcard" id="s5-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>Which deadlock handling strategy involves periodically checking the system for cycles and then killing a process or preempting a resource?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q8')">
+      <span class="optletter">A</span><span>Prevention</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q8')">
+      <span class="optletter">B</span><span>Avoidance</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q8')">
+      <span class="optletter">C</span><span>Detection and Recovery</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q8')">
+      <span class="optletter">D</span><span>Ignorance</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Detection and Recovery lets deadlocks happen, then periodically runs a detection algorithm (like cycle detection in the RAG) and recovers by killing a process or forcibly preempting a resource from one.</div>
+  </div>
+<div class="qcard" id="s5-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>Which strategy breaks the &#x27;Hold and Wait&#x27; condition by requiring a process to request all its needed resources at once, before execution begins?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q9')">
+      <span class="optletter">A</span><span>Detection and Recovery</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q9')">
+      <span class="optletter">B</span><span>Avoidance via Banker&#x27;s Algorithm</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q9')">
+      <span class="optletter">C</span><span>Prevention</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q9')">
+      <span class="optletter">D</span><span>Ostrich Algorithm</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Prevention strategies target breaking one of the four necessary conditions structurally. Requiring all resources to be requested upfront (instead of incrementally) directly eliminates the possibility of 'hold and wait'.</div>
+  </div>
+<div class="qcard" id="s5-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>In a Resource Allocation Graph, what does an edge from R1 to P2 represent?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q10')">
+      <span class="optletter">A</span><span>P2 is requesting resource R1</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's5-q10')">
+      <span class="optletter">B</span><span>Resource R1 is currently allocated to process P2</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q10')">
+      <span class="optletter">C</span><span>P2 has released R1</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's5-q10')">
+      <span class="optletter">D</span><span>R1 does not exist</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>By RAG convention, an edge FROM a resource TO a process (R1 -> P2) represents an assignment edge — meaning R1 is currently allocated to P2. An edge from a process to a resource (P -> R) represents a request edge instead.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t6">
+  <div class="topic-head"><span class="idx">06</span><h2>Memory Management</h2></div>
+  <div class="theory">
+
+<p><strong>Memory Management</strong> is the OS function responsible for allocating and deallocating memory space to processes, ensuring efficient use of RAM while keeping processes isolated from each other.</p>
+
+<h3>Contiguous Memory Allocation</h3>
+<p>Early systems allocated each process a single contiguous block of memory.</p>
+<table class="reftable">
+<tr><th>Scheme</th><th>Description</th></tr>
+<tr><td>Fixed (Static) Partitioning</td><td>Memory divided into fixed-size partitions at boot time; each partition holds one process &mdash; simple but causes <strong>internal fragmentation</strong> (wasted space inside a partition when the process is smaller than the partition)</td></tr>
+<tr><td>Dynamic Partitioning</td><td>Partitions are created dynamically, sized exactly to each process's needs &mdash; avoids internal fragmentation but causes <strong>external fragmentation</strong> (free memory scattered in small chunks, none large enough for a new request)</td></tr>
+</table>
+
+<h3>Fragmentation</h3>
+<ul>
+<li><strong>Internal Fragmentation</strong> &mdash; wasted space <em>within</em> an allocated block (block is bigger than what's actually needed).</li>
+<li><strong>External Fragmentation</strong> &mdash; wasted space <em>between</em> allocated blocks; total free memory may be sufficient but it's not contiguous.</li>
+</ul>
+
+<h3>Allocation Strategies (Dynamic Partitioning)</h3>
+<table class="reftable">
+<tr><th>Strategy</th><th>Approach</th></tr>
+<tr><td>First Fit</td><td>Allocate the first free block that is large enough</td></tr>
+<tr><td>Best Fit</td><td>Allocate the smallest free block that is large enough (minimizes leftover space, but that leftover is often too small to be useful, worsening external fragmentation over time)</td></tr>
+<tr><td>Worst Fit</td><td>Allocate the largest free block available (leaves the biggest possible leftover, hoping it stays useful)</td></tr>
+</table>
+
+<h3>Paging</h3>
+<p><strong>Paging</strong> solves external fragmentation by dividing physical memory into fixed-size blocks called <strong>frames</strong>, and logical memory (a process&rsquo;s address space) into blocks of the same size called <strong>pages</strong>. A <strong>page table</strong> maps each page to its corresponding frame.</p>
+<div class="diagram">Logical Address = (Page Number, Offset)
+
+  CPU generates logical address
+        |
+        v
+  Page Number ---> [Page Table] ---> Frame Number
+                                          |
+                                          v
+  Physical Address = (Frame Number, Offset)
+
+Example: Page size = 4KB, logical address 0x2050
+  Page Number = 0x2050 / 4096 = 2
+  Offset      = 0x2050 % 4096 = 80
+  Look up page 2 in the page table -> get Frame number, say Frame 5
+  Physical Address = Frame 5, Offset 80</div>
+<p>Paging eliminates external fragmentation entirely (since any free frame can hold any page), but introduces a small amount of <strong>internal fragmentation</strong> in the last page of a process (if it doesn&rsquo;t exactly fill a page).</p>
+
+<h3>Segmentation</h3>
+<p><strong>Segmentation</strong> divides a process into logical segments (code, stack, heap, data) of <strong>variable size</strong>, matching how programmers naturally think about a program's structure. Each segment has a base and limit register. Unlike paging, segmentation can suffer from external fragmentation since segments vary in size.</p>
+
+<table class="reftable">
+<tr><th></th><th>Paging</th><th>Segmentation</th></tr>
+<tr><td>Division basis</td><td>Fixed-size physical blocks (frames/pages)</td><td>Logical program divisions (variable size)</td></tr>
+<tr><td>Fragmentation</td><td>Internal only</td><td>External only</td></tr>
+<tr><td>Programmer visibility</td><td>Invisible to the programmer</td><td>Reflects logical program structure, more visible</td></tr>
+</table>
+
+<div class="callout"><strong>Interview tip:</strong> A very common question is "Why does paging avoid external fragmentation but segmentation doesn't?" &mdash; because paging uses fixed, uniform block sizes (any free frame fits any page), whereas segmentation uses variable sizes (a free gap may not exactly fit the next segment needed).</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s6-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is internal fragmentation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q1')">
+      <span class="optletter">A</span><span>Wasted space between allocated memory blocks</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q1')">
+      <span class="optletter">B</span><span>Wasted space within an allocated block, because it&#x27;s larger than what the process actually needs</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q1')">
+      <span class="optletter">C</span><span>A type of CPU scheduling inefficiency</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q1')">
+      <span class="optletter">D</span><span>A bug in the page table</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Internal fragmentation happens when an allocated block of memory is larger than required, wasting the unused space inside that block — for example, in fixed-size partitioning or paging's last page.</div>
+  </div>
+<div class="qcard" id="s6-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>Which memory allocation strategy allocates the smallest free block that is still large enough for the request?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q2')">
+      <span class="optletter">A</span><span>First Fit</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q2')">
+      <span class="optletter">B</span><span>Best Fit</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q2')">
+      <span class="optletter">C</span><span>Worst Fit</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q2')">
+      <span class="optletter">D</span><span>Random Fit</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Best Fit specifically searches for the smallest suitable free block to minimize leftover space — though ironically this can create many tiny unusable fragments over time.</div>
+  </div>
+<div class="qcard" id="s6-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>How does paging eliminate external fragmentation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q3')">
+      <span class="optletter">A</span><span>By using variable-sized memory blocks</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q3')">
+      <span class="optletter">B</span><span>By dividing memory into fixed-size frames/pages so any free frame can hold any page</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q3')">
+      <span class="optletter">C</span><span>By compacting memory after every process termination</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q3')">
+      <span class="optletter">D</span><span>By preventing more than one process from running at a time</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because paging uses uniform, fixed-size units (frames and pages), any free frame can accommodate any page — there's no need for a contiguous chunk of a specific size, which is what causes external fragmentation in variable-sized schemes.</div>
+  </div>
+<div class="qcard" id="s6-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What does a page table do?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q4')">
+      <span class="optletter">A</span><span>Stores the process&#x27;s source code</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q4')">
+      <span class="optletter">B</span><span>Maps logical page numbers to physical frame numbers</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q4')">
+      <span class="optletter">C</span><span>Tracks CPU scheduling priorities</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q4')">
+      <span class="optletter">D</span><span>Stores the process&#x27;s file system directory structure</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The page table is the core data structure of paging — for each page number in a process's logical address space, it holds the corresponding physical frame number where that page currently resides in memory.</div>
+  </div>
+<div class="qcard" id="s6-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>Given a page size of 4KB and logical address 0x2050, what is the page number?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q5')">
+      <span class="optletter">A</span><span>0</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q5')">
+      <span class="optletter">B</span><span>1</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q5')">
+      <span class="optletter">C</span><span>2</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q5')">
+      <span class="optletter">D</span><span>3</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Page number = logical address / page size = 0x2050 (8272 in decimal) / 4096 = 2 (integer division), with a remainder used as the offset.</div>
+  </div>
+<div class="qcard" id="s6-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What is the key difference between paging and segmentation in terms of fragmentation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q6')">
+      <span class="optletter">A</span><span>Both suffer from exactly the same type and amount of fragmentation</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q6')">
+      <span class="optletter">B</span><span>Paging suffers only internal fragmentation; segmentation suffers only external fragmentation</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q6')">
+      <span class="optletter">C</span><span>Paging suffers external fragmentation; segmentation suffers internal fragmentation</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q6')">
+      <span class="optletter">D</span><span>Neither paging nor segmentation ever causes fragmentation</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Paging's fixed block sizes mean any leftover waste is confined within the last page (internal). Segmentation's variable-sized segments can leave unusable gaps between segments in memory (external), similar to dynamic partitioning.</div>
+  </div>
+<div class="qcard" id="s6-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>Why does segmentation better reflect a programmer&#x27;s view of a program compared to paging?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q7')">
+      <span class="optletter">A</span><span>Segmentation uses smaller units than paging</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q7')">
+      <span class="optletter">B</span><span>Segments correspond to logical divisions like code, stack, heap, and data, matching how programs are naturally structured</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q7')">
+      <span class="optletter">C</span><span>Segmentation requires no page table equivalent at all</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q7')">
+      <span class="optletter">D</span><span>Paging cannot be used for any modern process</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Segmentation divides memory according to a program's logical structure (functions/code segment, stack, heap, global data) rather than arbitrary fixed-size chunks, which maps more naturally to how a programmer conceptually organizes a program.</div>
+  </div>
+<div class="qcard" id="s6-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>In dynamic (variable) partitioning, why does Best Fit not always perform better than First Fit in practice?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q8')">
+      <span class="optletter">A</span><span>Best Fit is actually slower and can leave many small, unusable fragments over time, worsening external fragmentation</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q8')">
+      <span class="optletter">B</span><span>Best Fit always uses more memory than the process needs</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q8')">
+      <span class="optletter">C</span><span>First Fit is impossible to implement</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q8')">
+      <span class="optletter">D</span><span>Best Fit never finds any suitable block</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>While Best Fit minimizes leftover space per allocation, it tends to create many very small leftover fragments across memory that are too small to satisfy future requests — paradoxically increasing external fragmentation despite its name.</div>
+  </div>
+<div class="qcard" id="s6-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>What information does each segment typically have associated with it in segmentation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q9')">
+      <span class="optletter">A</span><span>A frame number only</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q9')">
+      <span class="optletter">B</span><span>A base register and a limit register</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q9')">
+      <span class="optletter">C</span><span>A priority number for CPU scheduling</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q9')">
+      <span class="optletter">D</span><span>A file descriptor</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Each segment has a base (starting physical address) and a limit (length of the segment), which together are used to translate a logical (segment, offset) address into a physical address and to check bounds.</div>
+  </div>
+<div class="qcard" id="s6-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>Which fragmentation type does the LAST page of a process typically introduce, if the process size isn&#x27;t an exact multiple of the page size?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q10')">
+      <span class="optletter">A</span><span>External fragmentation</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's6-q10')">
+      <span class="optletter">B</span><span>Internal fragmentation</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q10')">
+      <span class="optletter">C</span><span>No fragmentation occurs in paging under any circumstance</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's6-q10')">
+      <span class="optletter">D</span><span>Segmentation fragmentation</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>If a process's total size doesn't perfectly divide into whole pages, the final page is only partially used, wasting the remainder of that page — this is internal fragmentation, the only type paging is subject to.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t7">
+  <div class="topic-head"><span class="idx">07</span><h2>Paging & Virtual Memory</h2></div>
+  <div class="theory">
+
+<p><strong>Virtual Memory</strong> is a technique that gives processes the illusion of a large, contiguous address space, even if physical memory (RAM) is smaller or fragmented &mdash; by keeping only the actively-used portions of a process in RAM and the rest on disk.</p>
+
+<h3>Demand Paging</h3>
+<p>Pages are loaded into memory <strong>only when needed</strong> (referenced), not all at once when a process starts. Each page table entry has a <strong>valid/invalid bit</strong>:</p>
+<ul>
+<li><strong>Valid</strong> &mdash; the page is currently in physical memory.</li>
+<li><strong>Invalid</strong> &mdash; the page is not in memory (either not yet used, or swapped out to disk).</li>
+</ul>
+
+<h3>Page Fault</h3>
+<p>A <strong>page fault</strong> occurs when a process references a page marked invalid in the page table (not currently in RAM). The OS handles it by:</p>
+<div class="diagram">1. Trap to OS (page fault interrupt)
+2. Check if the reference was valid (legal) or invalid (illegal access -> terminate process)
+3. Find a free frame in physical memory (or select a victim page to evict, if memory is full)
+4. Bring the required page in from disk into that frame
+5. Update the page table (mark as valid, set frame number)
+6. Restart the instruction that caused the page fault</div>
+
+<h3>Page Replacement Algorithms</h3>
+<p>When memory is full and a new page must be brought in, a page replacement algorithm decides which existing page to evict (the "victim").</p>
+<table class="reftable">
+<tr><th>Algorithm</th><th>Strategy</th></tr>
+<tr><td>FIFO (First In First Out)</td><td>Evicts the page that has been in memory the longest, regardless of usage</td></tr>
+<tr><td>Optimal (OPT / MIN)</td><td>Evicts the page that will not be used for the longest time in the future &mdash; theoretical best case, requires future knowledge (used as a benchmark)</td></tr>
+<tr><td>LRU (Least Recently Used)</td><td>Evicts the page that hasn't been used for the longest time in the past &mdash; approximates Optimal using historical access patterns</td></tr>
+</table>
+
+<h3>Belady&rsquo;s Anomaly</h3>
+<p>A counter-intuitive phenomenon (specific to FIFO) where <strong>increasing</strong> the number of physical memory frames can <strong>increase</strong> the number of page faults, instead of decreasing them. LRU and Optimal do not suffer from Belady's Anomaly.</p>
+<div class="diagram">Reference string: 1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5
+
+With 3 frames (FIFO): 9 page faults
+With 4 frames (FIFO): 10 page faults   <- MORE frames, MORE faults! (the anomaly)</div>
+
+<h3>Thrashing</h3>
+<p><strong>Thrashing</strong> occurs when a process spends more time paging (swapping pages in/out) than executing actual instructions &mdash; typically caused by too many processes competing for too little physical memory, each not having enough frames for its <strong>working set</strong> (the set of pages it actively needs at a given time). Detected via a sharp drop in CPU utilization despite high degree of multiprogramming.</p>
+
+<h3>Working Set Model</h3>
+<p>The <strong>working set</strong> of a process is the set of pages it has referenced in the most recent time window &Delta;. The OS uses this to decide how many frames to allocate to a process &mdash; if the working set doesn't fit in the frames allocated, thrashing is likely.</p>
+
+<div class="callout warn"><strong>Common confusion:</strong> a page fault is NOT necessarily an error condition &mdash; it's a completely normal part of demand paging. A page fault only becomes a genuine problem if it happens excessively, leading to thrashing.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s7-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is demand paging?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q1')">
+      <span class="optletter">A</span><span>Loading all pages of a process into memory at startup</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q1')">
+      <span class="optletter">B</span><span>Loading pages into memory only when they are actually referenced/needed</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q1')">
+      <span class="optletter">C</span><span>A page replacement algorithm</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q1')">
+      <span class="optletter">D</span><span>A method for detecting deadlocks</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Demand paging is a lazy-loading strategy: instead of loading an entire process into memory upfront, pages are brought in from disk only when the CPU actually references them.</div>
+  </div>
+<div class="qcard" id="s7-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>What does the valid/invalid bit in a page table entry indicate?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q2')">
+      <span class="optletter">A</span><span>Whether the process has permission to run</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q2')">
+      <span class="optletter">B</span><span>Whether the corresponding page is currently present in physical memory</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q2')">
+      <span class="optletter">C</span><span>Whether the CPU is currently idle</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q2')">
+      <span class="optletter">D</span><span>Whether the process has terminated</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The valid/invalid bit tells the MMU whether a given page is currently loaded into a physical frame (valid) or not present in memory at all, requiring a page fault to bring it in (invalid).</div>
+  </div>
+<div class="qcard" id="s7-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>What triggers a page fault?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q3')">
+      <span class="optletter">A</span><span>A process requests more CPU time than allowed</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q3')">
+      <span class="optletter">B</span><span>A process references a page that is marked invalid (not currently in physical memory)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q3')">
+      <span class="optletter">C</span><span>A process&#x27;s priority changes</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q3')">
+      <span class="optletter">D</span><span>Two processes request the same file simultaneously</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A page fault is a hardware trap that occurs when a memory reference points to a page marked invalid in the page table — the OS must then step in to bring that page into memory.</div>
+  </div>
+<div class="qcard" id="s7-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>Which page replacement algorithm requires knowledge of future memory references and serves mainly as a theoretical benchmark?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q4')">
+      <span class="optletter">A</span><span>FIFO</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q4')">
+      <span class="optletter">B</span><span>LRU</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q4')">
+      <span class="optletter">C</span><span>Optimal (OPT/MIN)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q4')">
+      <span class="optletter">D</span><span>Round Robin</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The Optimal algorithm evicts the page that won't be used for the longest time in the future — but since no real system can know the future, it's used purely as a theoretical best-case comparison point for other algorithms.</div>
+  </div>
+<div class="qcard" id="s7-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>What is Belady&#x27;s Anomaly?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q5')">
+      <span class="optletter">A</span><span>A situation where LRU always performs worse than FIFO</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q5')">
+      <span class="optletter">B</span><span>A phenomenon (mainly in FIFO) where increasing the number of physical frames can increase, rather than decrease, the number of page faults</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q5')">
+      <span class="optletter">C</span><span>An error that occurs only during process creation</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q5')">
+      <span class="optletter">D</span><span>A type of deadlock specific to virtual memory</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Belady's Anomaly is the counter-intuitive result where adding MORE physical frames leads to MORE page faults under certain reference strings with FIFO replacement — it doesn't occur with LRU or Optimal.</div>
+  </div>
+<div class="qcard" id="s7-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What does LRU (Least Recently Used) page replacement evict?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q6')">
+      <span class="optletter">A</span><span>The page that was most recently used</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q6')">
+      <span class="optletter">B</span><span>The page that has been in memory the longest, regardless of usage pattern</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q6')">
+      <span class="optletter">C</span><span>The page that has not been used for the longest time in the past</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q6')">
+      <span class="optletter">D</span><span>A randomly selected page</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>LRU looks backward in time and evicts whichever page has gone the longest without being referenced, approximating the Optimal algorithm's forward-looking strategy using historical data instead.</div>
+  </div>
+<div class="qcard" id="s7-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>What is thrashing?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q7')">
+      <span class="optletter">A</span><span>When a process finishes execution much faster than expected</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q7')">
+      <span class="optletter">B</span><span>When a process spends more time paging (swapping) than executing actual instructions, due to insufficient frames</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q7')">
+      <span class="optletter">C</span><span>A CPU scheduling algorithm for real-time systems</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q7')">
+      <span class="optletter">D</span><span>A normal, harmless side effect of demand paging that requires no attention</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Thrashing happens when there's so much page-fault activity (due to too many processes competing for too few frames) that the system spends nearly all its time swapping pages in and out rather than doing useful work — CPU utilization drops sharply despite high multiprogramming.</div>
+  </div>
+<div class="qcard" id="s7-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>What is the &#x27;working set&#x27; of a process?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q8')">
+      <span class="optletter">A</span><span>The total size of the process&#x27;s executable file on disk</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q8')">
+      <span class="optletter">B</span><span>The set of pages a process has referenced within a recent time window</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q8')">
+      <span class="optletter">C</span><span>The number of CPU cores assigned to a process</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q8')">
+      <span class="optletter">D</span><span>The list of all files opened by the process</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>The working set is a snapshot of which pages a process is ACTIVELY using in the recent past (within a window Δ) — it's used to estimate how many frames a process needs to avoid excessive page faulting.</div>
+  </div>
+<div class="qcard" id="s7-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>Which of these page replacement algorithms does NOT suffer from Belady&#x27;s Anomaly?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q9')">
+      <span class="optletter">A</span><span>FIFO</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q9')">
+      <span class="optletter">B</span><span>LRU and Optimal</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q9')">
+      <span class="optletter">C</span><span>Only FIFO with small reference strings</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q9')">
+      <span class="optletter">D</span><span>All algorithms suffer from Belady&#x27;s Anomaly equally</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Belady's Anomaly is a known weakness specifically associated with FIFO. LRU and Optimal belong to a class of algorithms (stack algorithms) that are mathematically guaranteed not to exhibit this anomaly.</div>
+  </div>
+<div class="qcard" id="s7-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>After a page fault is handled and the missing page is loaded into memory, what happens next?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q10')">
+      <span class="optletter">A</span><span>The process is terminated immediately</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's7-q10')">
+      <span class="optletter">B</span><span>The instruction that caused the page fault is restarted</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q10')">
+      <span class="optletter">C</span><span>The OS skips to the next instruction, ignoring the faulting one</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's7-q10')">
+      <span class="optletter">D</span><span>The page table is deleted</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Once the required page is brought into a free (or newly freed) frame and the page table is updated, the OS restarts the exact instruction that triggered the fault — from the CPU's perspective, execution just continues normally as if the page had always been there.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t8">
+  <div class="topic-head"><span class="idx">08</span><h2>Disk Scheduling</h2></div>
+  <div class="theory">
+
+<p><strong>Disk Scheduling</strong> algorithms decide the order in which pending disk I/O requests (each targeting a specific cylinder/track) are serviced, aiming to minimize total <strong>head movement</strong> (seek time) and/or average waiting time.</p>
+
+<h3>Why It Matters</h3>
+<p>A disk's read/write head must physically move across cylinders to reach each requested track. This mechanical movement (seek time) is the slowest part of a disk I/O operation, so scheduling requests intelligently has a large effect on overall performance.</p>
+
+<div class="diagram-svg">
+<svg width="100%" viewBox="0 0 680 340" role="img">
+<title>Disk head movement comparison</title>
+<desc>Illustrative number-line diagram showing how FCFS, SSTF, and SCAN algorithms move the disk head across cylinder positions 0 to 199 to service a request queue, starting from head position 50.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<text class="th" x="40" y="30">Request queue: 82, 170, 43, 140, 24, 16, 190</text>
+<text class="ts" x="40" y="48">Head starts at 50. Cylinders range 0-199.</text>
+
+<!-- Track baseline -->
+<line x1="60" y1="90" x2="620" y2="90" stroke="var(--t)" stroke-width="0.5" opacity="0.4"/>
+<text class="ts" x="60" y="105">0</text>
+<text class="ts" x="600" y="105">199</text>
+
+<!-- Request marks on the track -->
+<g>
+<circle cx="201" cy="90" r="3" class="c-gray"/>
+<circle cx="271" cy="90" r="3" class="c-gray"/>
+<circle cx="357" cy="90" r="3" class="c-gray"/>
+<circle cx="502" cy="90" r="3" class="c-gray"/>
+<circle cx="571" cy="90" r="3" class="c-gray"/>
+<circle cx="121" cy="90" r="3" class="c-gray"/>
+<circle cx="140" cy="90" r="3" class="c-gray"/>
+<circle cx="200" cy="72" r="3" class="c-amber"/>
+</g>
+<text class="ts" x="121" y="72" text-anchor="middle">16</text>
+<text class="ts" x="140" y="72" text-anchor="middle">24</text>
+<text class="ts" x="171" y="72" text-anchor="middle">43</text>
+<text class="ts" x="200" y="60" text-anchor="middle">50 (start)</text>
+<text class="ts" x="271" y="72" text-anchor="middle">82</text>
+<text class="ts" x="357" y="72" text-anchor="middle">140</text>
+<text class="ts" x="502" y="72" text-anchor="middle">170</text>
+<text class="ts" x="571" y="72" text-anchor="middle">190</text>
+
+<!-- FCFS path -->
+<text class="th" x="40" y="145">FCFS: 50→82→170→43→140→24→16→190</text>
+<path fill="none" stroke="#D85A30" stroke-width="1.5" opacity="0.8"
+  d="M200,160 L271,160 L502,175 L171,190 L357,175 L140,190 L121,190 L590,175"/>
+<text class="ts" x="470" y="200">Total head movement: 642 cylinders</text>
+
+<!-- SSTF path -->
+<text class="th" x="40" y="240">SSTF: 50→43→24→16→82→140→170→190</text>
+<path fill="none" stroke="#1D9E75" stroke-width="1.5" opacity="0.8"
+  d="M200,255 L171,255 L140,270 L121,270 L271,255 L357,270 L502,255 L571,270"/>
+<text class="ts" x="470" y="295">Total head movement: 208 cylinders</text>
+
+<text class="ts" x="40" y="325">SSTF picks the nearest request each time — far fewer total cylinders crossed than FCFS.</text>
+</svg>
+</div>
+
+<h3>1. FCFS (First Come First Serve)</h3>
+<p>Services requests strictly in the order they arrive in the queue. Simple and fair, but can result in a lot of unnecessary head movement (as seen in the diagram above, zig-zagging back and forth).</p>
+
+<h3>2. SSTF (Shortest Seek Time First)</h3>
+<p>Always services the request closest to the current head position next. Greatly reduces total head movement compared to FCFS, but can cause <strong>starvation</strong> of requests far from the current head position if closer requests keep arriving.</p>
+
+<h3>3. SCAN (Elevator Algorithm)</h3>
+<p>The head moves in one direction (say, toward the highest cylinder), servicing all requests along the way, until it reaches the end of the disk, then reverses direction and services requests on the way back &mdash; like an elevator.</p>
+<div class="diagram">Example: requests = 82, 170, 43, 140, 24, 16, 190
+Head starts at 50, moving toward higher cylinders (direction = up), disk range 0-199
+
+Order serviced: 82, 140, 170, 190, 199(end), 43, 24, 16
+Total head movement = (199-50) + (199-16) = 149 + 183 = 332</div>
+
+<h3>4. C-SCAN (Circular SCAN)</h3>
+<p>Like SCAN, but instead of reversing direction at the end, the head jumps immediately back to the beginning (cylinder 0) and continues scanning in the same direction. This gives more <strong>uniform wait times</strong> across all cylinders (SCAN tends to favor cylinders near the middle, since they get visited on both sweeps).</p>
+<div class="diagram">Example: same requests, head starts at 50, moving up, disk range 0-199
+
+Order serviced: 82, 140, 170, 190, 199(end), jump to 0, then 16, 24, 43
+Total head movement = (199-50) + 199 + 43 = 149 + 199 + 43 = 391
+(the jump from 199 to 0 is usually NOT counted as head movement, since it's a fast return, not a seek)</div>
+
+<h3>5. LOOK and C-LOOK</h3>
+<p>Optimizations of SCAN and C-SCAN respectively: instead of going all the way to the disk's physical end (cylinder 0 or max), the head only goes as far as the <strong>last request</strong> in that direction, then reverses (LOOK) or jumps back (C-LOOK). This avoids wasting movement on empty regions with no pending requests.</p>
+
+<table class="reftable">
+<tr><th>Algorithm</th><th>Direction changes</th><th>Fairness</th><th>Typical use</th></tr>
+<tr><td>FCFS</td><td>None enforced</td><td>Fair by arrival order, poor efficiency</td><td>Simple systems, light load</td></tr>
+<tr><td>SSTF</td><td>Frequent, greedy</td><td>Can starve distant requests</td><td>Light-to-moderate load</td></tr>
+<tr><td>SCAN</td><td>Only at disk ends</td><td>Favors middle cylinders</td><td>Heavier, more uniform load</td></tr>
+<tr><td>C-SCAN</td><td>Only at disk ends, one direction</td><td>More uniform than SCAN</td><td>Systems needing fairness</td></tr>
+<tr><td>LOOK / C-LOOK</td><td>At last request, not disk end</td><td>Similar to SCAN/C-SCAN but less wasted movement</td><td>Most practical/modern systems</td></tr>
+</table>
+
+<div class="callout"><strong>Interview tip:</strong> Numerical questions almost always give you a request queue, a starting head position, and a direction — draw the number line (like the diagram above) and trace the path step by step. Don't try to do it in your head; visualizing it prevents silly mistakes.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s8-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is the main goal of disk scheduling algorithms?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q1')">
+      <span class="optletter">A</span><span>To maximize the total distance the disk head travels</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q1')">
+      <span class="optletter">B</span><span>To minimize total head movement (seek time) and/or average waiting time for I/O requests</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q1')">
+      <span class="optletter">C</span><span>To ensure only one process can use the disk ever</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q1')">
+      <span class="optletter">D</span><span>To increase the disk&#x27;s rotational speed</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Since seek time (physical head movement) is the slowest part of disk I/O, scheduling algorithms aim to service pending requests in an order that minimizes total head movement and/or keeps waiting times fair.</div>
+  </div>
+<div class="qcard" id="s8-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>Which disk scheduling algorithm services requests strictly in the order they arrive, regardless of their cylinder position?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q2')">
+      <span class="optletter">A</span><span>SSTF</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q2')">
+      <span class="optletter">B</span><span>SCAN</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q2')">
+      <span class="optletter">C</span><span>FCFS</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q2')">
+      <span class="optletter">D</span><span>C-LOOK</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>FCFS (First Come First Serve) is the simplest approach — it ignores cylinder positions entirely and just processes requests in arrival order, which can cause a lot of unnecessary back-and-forth head movement.</div>
+  </div>
+<div class="qcard" id="s8-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>What is the main risk of using SSTF (Shortest Seek Time First)?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q3')">
+      <span class="optletter">A</span><span>It always takes more total head movement than FCFS</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q3')">
+      <span class="optletter">B</span><span>Requests far from the current head position can be starved if closer requests keep arriving</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q3')">
+      <span class="optletter">C</span><span>It cannot be implemented on modern disks</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q3')">
+      <span class="optletter">D</span><span>It requires the head to always start at cylinder 0</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because SSTF greedily always jumps to the nearest request, a steady stream of nearby requests can indefinitely delay a distant request — this is starvation, similar to what happens with SJF in CPU scheduling.</div>
+  </div>
+<div class="qcard" id="s8-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>In the SCAN algorithm, what happens when the head reaches the end of the disk?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q4')">
+      <span class="optletter">A</span><span>The head stops permanently</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q4')">
+      <span class="optletter">B</span><span>The head reverses direction and services requests on the way back, like an elevator</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q4')">
+      <span class="optletter">C</span><span>The head jumps immediately back to cylinder 0</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q4')">
+      <span class="optletter">D</span><span>All pending requests are discarded</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>SCAN moves in one direction servicing all requests until it hits the physical end of the disk, then reverses and sweeps back the other way — this back-and-forth pattern is why it's nicknamed the 'elevator algorithm'.</div>
+  </div>
+<div class="qcard" id="s8-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>How does C-SCAN differ from standard SCAN?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q5')">
+      <span class="optletter">A</span><span>C-SCAN never changes direction at all</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q5')">
+      <span class="optletter">B</span><span>Instead of reversing direction at the end, C-SCAN jumps back to the beginning and continues scanning in the same direction</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q5')">
+      <span class="optletter">C</span><span>C-SCAN only services odd-numbered cylinders</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q5')">
+      <span class="optletter">D</span><span>C-SCAN is identical to FCFS</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>C-SCAN (Circular SCAN) always sweeps in one consistent direction — after reaching the end, it jumps back to the start (cylinder 0) rather than reversing, which gives more uniform wait times across all cylinders compared to SCAN.</div>
+  </div>
+<div class="qcard" id="s8-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>Why might C-SCAN provide more uniform waiting times than SCAN?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q6')">
+      <span class="optletter">A</span><span>Because it services fewer total requests</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q6')">
+      <span class="optletter">B</span><span>Because SCAN tends to favor cylinders near the middle (visited on both sweeps), while C-SCAN visits cylinders in one consistent direction each cycle</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q6')">
+      <span class="optletter">C</span><span>Because C-SCAN uses two disk heads simultaneously</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q6')">
+      <span class="optletter">D</span><span>Because C-SCAN never has to wait for any request</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>In standard SCAN, middle cylinders get serviced twice as often (once on each sweep direction) compared to cylinders near the edges, causing uneven waiting times. C-SCAN's one-directional sweep pattern spreads out waiting more evenly.</div>
+  </div>
+<div class="qcard" id="s8-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>What is the key difference between SCAN and LOOK?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q7')">
+      <span class="optletter">A</span><span>LOOK only goes as far as the last pending request in a direction, rather than all the way to the disk&#x27;s physical end</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q7')">
+      <span class="optletter">B</span><span>SCAN and LOOK are exactly identical algorithms</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q7')">
+      <span class="optletter">C</span><span>LOOK cannot service requests on both sides of the head</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q7')">
+      <span class="optletter">D</span><span>SCAN is always faster than LOOK in every case</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>LOOK is an optimization of SCAN — instead of blindly continuing to the disk's absolute end/beginning, it 'looks' ahead and reverses direction as soon as there are no more pending requests in the current direction, avoiding wasted movement.</div>
+  </div>
+<div class="qcard" id="s8-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>Given requests at cylinders 82, 170, 43 with the head starting at 50, which request would SSTF service FIRST?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q8')">
+      <span class="optletter">A</span><span>170, because it&#x27;s the largest number</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q8')">
+      <span class="optletter">B</span><span>43, because it has the smallest distance from the current head position (50-43=7)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q8')">
+      <span class="optletter">C</span><span>82, because it was listed first in the queue</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q8')">
+      <span class="optletter">D</span><span>All three are serviced simultaneously</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>SSTF always picks whichever pending request has the smallest seek distance from the current head position. |50-43|=7, |50-82|=32, |50-170|=120 — so 43 is closest and serviced first.</div>
+  </div>
+<div class="qcard" id="s8-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>In C-LOOK, when the head reaches the last request in its current direction, what happens next?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q9')">
+      <span class="optletter">A</span><span>It reverses direction immediately, like LOOK</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q9')">
+      <span class="optletter">B</span><span>It jumps directly to the lowest-numbered pending request and continues in the same direction</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q9')">
+      <span class="optletter">C</span><span>It goes all the way to cylinder 0 first, then reverses</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q9')">
+      <span class="optletter">D</span><span>The algorithm terminates</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>C-LOOK combines C-SCAN's one-directional circular sweep with LOOK's efficiency — after servicing the last request in one direction, it jumps straight to the lowest pending request (not all the way to cylinder 0) and continues scanning in the same direction.</div>
+  </div>
+<div class="qcard" id="s8-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>Why is FCFS generally considered inefficient for disk scheduling despite being simple and fair?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q10')">
+      <span class="optletter">A</span><span>It never actually services any requests</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's8-q10')">
+      <span class="optletter">B</span><span>The strict arrival order can cause the head to move back and forth erratically across the disk, resulting in high total seek time</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q10')">
+      <span class="optletter">C</span><span>It requires special hardware not found in most disks</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's8-q10')">
+      <span class="optletter">D</span><span>It always results in exactly zero head movement</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because FCFS ignores cylinder proximity entirely, a poorly-ordered arrival sequence can send the head zig-zagging across the disk (e.g., servicing cylinder 170, then 43, then 140), racking up far more total movement than a proximity-aware algorithm like SSTF or SCAN would.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+<section class="topic" id="t9">
+  <div class="topic-head"><span class="idx">09</span><h2>File Systems</h2></div>
+  <div class="theory">
+
+<p>A <strong>file system</strong> defines how data is stored, organized, named, and retrieved on a storage device. It manages files, directories, free space, and metadata (permissions, timestamps, size).</p>
+
+<h3>File Allocation Methods</h3>
+<p>Determines how a file's data blocks are physically arranged on disk.</p>
+<table class="reftable">
+<tr><th>Method</th><th>Description</th><th>Drawback</th></tr>
+<tr><td>Contiguous Allocation</td><td>Each file occupies a single contiguous range of blocks on disk</td><td>Fast sequential access, but suffers external fragmentation; file growth is hard to accommodate</td></tr>
+<tr><td>Linked Allocation</td><td>Each block contains a pointer to the next block in the file (like a linked list)</td><td>No external fragmentation, but slow random access (must traverse from the start) and pointer overhead per block</td></tr>
+<tr><td>Indexed Allocation</td><td>An index block stores pointers to all of a file's data blocks</td><td>Supports fast direct access; extra space needed for the index block itself</td></tr>
+</table>
+
+<h3>Inodes and Indexed Allocation (Unix-style)</h3>
+<p>An <strong>inode</strong> (index node) stores a file&rsquo;s metadata (size, permissions, timestamps) plus pointers to its data blocks. To support both small and very large files efficiently, inodes typically use a mix of pointer types:</p>
+
+<div class="diagram-svg">
+<svg width="100%" viewBox="0 0 680 380" role="img">
+<title>Inode structure and indexed allocation</title>
+<desc>Structural diagram showing an inode containing metadata and pointers, with direct pointers linking to data blocks, a single indirect pointer linking to a block of pointers, and those in turn linking to further data blocks.</desc>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+
+<g class="c-purple">
+<rect x="40" y="40" width="180" height="280" rx="16" stroke-width="0.5"/>
+<text class="th" x="130" y="64" text-anchor="middle">Inode</text>
+<text class="ts" x="130" y="82" text-anchor="middle">Metadata + pointers</text>
+</g>
+
+<rect x="60" y="100" width="140" height="24" rx="4" class="c-gray" stroke-width="0.5"/>
+<text class="ts" x="130" y="112" text-anchor="middle">File size, permissions</text>
+
+<rect x="60" y="134" width="140" height="24" rx="4" class="c-teal" stroke-width="0.5"/>
+<text class="ts" x="130" y="146" text-anchor="middle">Direct pointer 1</text>
+
+<rect x="60" y="164" width="140" height="24" rx="4" class="c-teal" stroke-width="0.5"/>
+<text class="ts" x="130" y="176" text-anchor="middle">Direct pointer 2</text>
+
+<rect x="60" y="194" width="140" height="24" rx="4" class="c-teal" stroke-width="0.5"/>
+<text class="ts" x="130" y="206" text-anchor="middle">Direct pointer 3</text>
+
+<rect x="60" y="240" width="140" height="24" rx="4" class="c-coral" stroke-width="0.5"/>
+<text class="ts" x="130" y="252" text-anchor="middle">Single indirect</text>
+
+<!-- Direct blocks -->
+<g class="c-teal">
+<rect x="290" y="130" width="90" height="32" rx="6" stroke-width="0.5"/>
+<text class="ts" x="335" y="146" text-anchor="middle">Data block</text>
+</g>
+<g class="c-teal">
+<rect x="290" y="170" width="90" height="32" rx="6" stroke-width="0.5"/>
+<text class="ts" x="335" y="186" text-anchor="middle">Data block</text>
+</g>
+<g class="c-teal">
+<rect x="290" y="210" width="90" height="32" rx="6" stroke-width="0.5"/>
+<text class="ts" x="335" y="226" text-anchor="middle">Data block</text>
+</g>
+
+<line x1="200" y1="146" x2="288" y2="146" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+<line x1="200" y1="176" x2="288" y2="186" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+<line x1="200" y1="206" x2="288" y2="222" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+
+<!-- Indirect block -->
+<g class="c-coral">
+<rect x="290" y="270" width="110" height="32" rx="6" stroke-width="0.5"/>
+<text class="ts" x="345" y="286" text-anchor="middle">Block of pointers</text>
+</g>
+<line x1="200" y1="252" x2="288" y2="282" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+
+<g class="c-coral">
+<rect x="450" y="240" width="90" height="28" rx="6" stroke-width="0.5"/>
+<text class="ts" x="495" y="254" text-anchor="middle">Data block</text>
+</g>
+<g class="c-coral">
+<rect x="450" y="276" width="90" height="28" rx="6" stroke-width="0.5"/>
+<text class="ts" x="495" y="290" text-anchor="middle">Data block</text>
+</g>
+<g class="c-coral">
+<rect x="450" y="312" width="90" height="28" rx="6" stroke-width="0.5"/>
+<text class="ts" x="495" y="326" text-anchor="middle">Data block</text>
+</g>
+
+<line x1="400" y1="280" x2="448" y2="254" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+<line x1="400" y1="286" x2="448" y2="290" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+<line x1="400" y1="292" x2="448" y2="322" class="arr" stroke="var(--t)" marker-end="url(#arrow)"/>
+
+<text class="ts" x="450" y="360" text-anchor="middle">Direct pointers give fast access to small files;</text>
+<text class="ts" x="450" y="374" text-anchor="middle">indirect pointers extend reach for larger files.</text>
+</svg>
+</div>
+
+<ul>
+<li><strong>Direct pointers</strong> &mdash; point straight to a data block. Fast, but limited in count (a fixed number of direct pointers per inode).</li>
+<li><strong>Single indirect pointer</strong> &mdash; points to a block that itself contains more pointers to data blocks, extending the file size an inode can address.</li>
+<li><strong>Double/triple indirect pointers</strong> &mdash; point to blocks of pointers to blocks of pointers (and so on), allowing enormous files to be addressed while keeping the inode itself small and fixed-size.</li>
+</ul>
+
+<h3>Directory Structures</h3>
+<table class="reftable">
+<tr><th>Structure</th><th>Description</th></tr>
+<tr><td>Single-Level</td><td>One directory for all files &mdash; simple but no organization, no duplicate filenames allowed</td></tr>
+<tr><td>Two-Level</td><td>Each user gets their own directory &mdash; solves naming collisions between users, but no sub-organization within a user's space</td></tr>
+<tr><td>Tree-Structured</td><td>Directories can contain subdirectories, forming a hierarchy (like modern file systems: <code>/home/user/docs/</code>)</td></tr>
+<tr><td>Acyclic Graph</td><td>Allows shared subdirectories/files via links, while still disallowing cycles</td></tr>
+</table>
+
+<h3>Hard Links vs Soft (Symbolic) Links</h3>
+<table class="reftable">
+<tr><th></th><th>Hard Link</th><th>Soft Link (Symlink)</th></tr>
+<tr><td>What it points to</td><td>The same inode (same physical data) as the original file</td><td>The file's pathname (a separate small file containing a path string)</td></tr>
+<tr><td>If original is deleted</td><td>Still works &mdash; data persists as long as at least one hard link exists (reference count)</td><td>Breaks &mdash; becomes a "dangling" link pointing to nothing</td></tr>
+<tr><td>Cross filesystem/partition?</td><td>No &mdash; must be on the same filesystem (same inode table)</td><td>Yes &mdash; can point to a file on a different filesystem/partition</td></tr>
+<tr><td>Can link to a directory?</td><td>Generally not allowed (to prevent cycles)</td><td>Yes</td></tr>
+</table>
+
+<h3>Free Space Management</h3>
+<ul>
+<li><strong>Bitmap (Bit Vector)</strong> &mdash; one bit per block: 0 = free, 1 = allocated. Compact and fast to scan for contiguous free regions.</li>
+<li><strong>Linked List</strong> &mdash; free blocks are chained together in a list; no extra space needed elsewhere, but traversal to find free blocks is slower.</li>
+<li><strong>Grouping</strong> &mdash; the first free block stores addresses of several other free blocks, reducing traversal overhead.</li>
+</ul>
+
+<div class="callout warn"><strong>Common interview confusion:</strong> a hard link is NOT a "copy" of a file &mdash; both the original name and the hard link point to the exact same inode/data on disk. Deleting one name just decrements the inode's link count; the data is only actually freed when the count reaches zero.</div>
+
+  </div>
+<div class="quiz-section">
+  <div class="quiz-header">
+    <span class="qicon">📝</span><h3>SECTION QUIZ</h3>
+    <span class="qcount">10 questions</span>
+  </div>
+  <div class="qcard" id="s9-q1" data-answered="false">
+    <div class="qtext"><span class="qnum">Q1.</span>What is the main drawback of Contiguous File Allocation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q1')">
+      <span class="optletter">A</span><span>It cannot support sequential access at all</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q1')">
+      <span class="optletter">B</span><span>It suffers from external fragmentation and makes file growth difficult to accommodate</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q1')">
+      <span class="optletter">C</span><span>It requires a pointer in every data block</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q1')">
+      <span class="optletter">D</span><span>It cannot be used for files larger than 1KB</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Since contiguous allocation requires a single unbroken range of blocks, free space can become fragmented over time (external fragmentation), and growing a file in place is often impossible if adjacent blocks are already used.</div>
+  </div>
+<div class="qcard" id="s9-q2" data-answered="false">
+    <div class="qtext"><span class="qnum">Q2.</span>In Linked Allocation, how is a file&#x27;s data physically organized on disk?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q2')">
+      <span class="optletter">A</span><span>All in one contiguous block</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q2')">
+      <span class="optletter">B</span><span>Each block contains a pointer to the next block, forming a chain</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q2')">
+      <span class="optletter">C</span><span>Using a single index block listing all data blocks</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q2')">
+      <span class="optletter">D</span><span>Files are not allowed to be linked together</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Linked allocation avoids external fragmentation by chaining blocks together like a linked list — each block holds a pointer to the next block belonging to that file, wherever it may be on disk.</div>
+  </div>
+<div class="qcard" id="s9-q3" data-answered="false">
+    <div class="qtext"><span class="qnum">Q3.</span>What is a key drawback of Linked Allocation compared to Indexed Allocation?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q3')">
+      <span class="optletter">A</span><span>It requires far more disk space overall</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q3')">
+      <span class="optletter">B</span><span>Random/direct access is slow since you must traverse the chain from the beginning to reach a specific block</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q3')">
+      <span class="optletter">C</span><span>It cannot store files larger than 1MB</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q3')">
+      <span class="optletter">D</span><span>It doesn&#x27;t work with any modern operating system</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Because each block only knows the location of the NEXT block, accessing, say, the 100th block of a file requires traversing all 99 blocks before it — this makes random access very slow compared to indexed allocation's direct lookups.</div>
+  </div>
+<div class="qcard" id="s9-q4" data-answered="false">
+    <div class="qtext"><span class="qnum">Q4.</span>What does an inode store?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q4')">
+      <span class="optletter">A</span><span>Only the file&#x27;s name</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q4')">
+      <span class="optletter">B</span><span>A file&#x27;s metadata (size, permissions, timestamps) plus pointers to its data blocks</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q4')">
+      <span class="optletter">C</span><span>The entire contents of every file on the disk</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q4')">
+      <span class="optletter">D</span><span>A list of all users on the system</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>An inode is the core metadata structure for a file in Unix-style filesystems — it holds attributes like size and permissions, along with direct/indirect pointers that locate the actual data blocks.</div>
+  </div>
+<div class="qcard" id="s9-q5" data-answered="false">
+    <div class="qtext"><span class="qnum">Q5.</span>Why do inodes use indirect pointers (single, double, triple) in addition to direct pointers?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q5')">
+      <span class="optletter">A</span><span>To make small files load slower on purpose</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q5')">
+      <span class="optletter">B</span><span>To allow addressing much larger files while keeping the inode itself a small, fixed size</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q5')">
+      <span class="optletter">C</span><span>Because direct pointers are illegal in modern filesystems</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q5')">
+      <span class="optletter">D</span><span>To store multiple copies of the same file</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A fixed, small number of direct pointers alone couldn't address very large files. Indirect pointers let an inode reach many more data blocks (via blocks-of-pointers) without growing the inode's own fixed size — striking a balance between small-file speed and large-file capacity.</div>
+  </div>
+<div class="qcard" id="s9-q6" data-answered="false">
+    <div class="qtext"><span class="qnum">Q6.</span>What is the fundamental difference between a hard link and a soft (symbolic) link?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q6')">
+      <span class="optletter">A</span><span>A hard link points to the same inode as the original file; a soft link points to the file&#x27;s pathname as a separate small file</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q6')">
+      <span class="optletter">B</span><span>They are functionally identical in every scenario</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q6')">
+      <span class="optletter">C</span><span>A soft link cannot ever break, while a hard link always breaks when the original is renamed</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q6')">
+      <span class="optletter">D</span><span>Hard links only work on Windows, and soft links only work on Linux</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A hard link is essentially another name for the exact same inode/data — no distinction from the 'original.' A soft link is a separate, small file that just stores a path string pointing to the target — if that path becomes invalid, the symlink breaks.</div>
+  </div>
+<div class="qcard" id="s9-q7" data-answered="false">
+    <div class="qtext"><span class="qnum">Q7.</span>What happens to a hard link if the original file is deleted?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q7')">
+      <span class="optletter">A</span><span>The hard link immediately becomes inaccessible / dangling</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q7')">
+      <span class="optletter">B</span><span>The hard link still works, since the data persists as long as at least one hard link (reference count) remains</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q7')">
+      <span class="optletter">C</span><span>The entire filesystem crashes</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q7')">
+      <span class="optletter">D</span><span>The hard link automatically converts into a soft link</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Inodes track a reference/link count. Deleting one name (including the 'original') just decrements that count — the actual data blocks are only freed once the count reaches zero, meaning any remaining hard links still fully work.</div>
+  </div>
+<div class="qcard" id="s9-q8" data-answered="false">
+    <div class="qtext"><span class="qnum">Q8.</span>Which directory structure allows directories to contain subdirectories, forming a hierarchy like /home/user/docs/?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q8')">
+      <span class="optletter">A</span><span>Single-Level Directory</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q8')">
+      <span class="optletter">B</span><span>Two-Level Directory</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q8')">
+      <span class="optletter">C</span><span>Tree-Structured Directory</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q8')">
+      <span class="optletter">D</span><span>None of these support subdirectories</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A tree-structured directory is what nearly all modern filesystems use — directories can nest arbitrarily deep, forming a hierarchical path structure like /home/user/docs/file.txt.</div>
+  </div>
+<div class="qcard" id="s9-q9" data-answered="false">
+    <div class="qtext"><span class="qnum">Q9.</span>In free space management, what does a Bitmap (bit vector) approach use to track free blocks?</div>
+    <div class="opts">
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q9')">
+      <span class="optletter">A</span><span>A single bit per block: 0 for free, 1 for allocated (or vice versa)</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q9')">
+      <span class="optletter">B</span><span>A full copy of every file stored redundantly</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q9')">
+      <span class="optletter">C</span><span>A separate physical disk dedicated only to tracking free space</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q9')">
+      <span class="optletter">D</span><span>Nothing — bitmaps cannot track free space</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>A bitmap dedicates exactly one bit per disk block, making it very compact, and it's fast to scan for contiguous runs of free blocks — a common real-world technique for free space tracking.</div>
+  </div>
+<div class="qcard" id="s9-q10" data-answered="false">
+    <div class="qtext"><span class="qnum">Q10.</span>Can a soft (symbolic) link point to a file on a different filesystem or partition than the one it resides on?</div>
+    <div class="opts">
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q10')">
+      <span class="optletter">A</span><span>No, symlinks are always restricted to the same filesystem as hard links</span>
+    </button>
+    <button class="opt" data-correct="true" onclick="answerQuiz(this, true, 's9-q10')">
+      <span class="optletter">B</span><span>Yes, because a symlink just stores a path string, which can reference any location the OS can resolve, even across filesystems</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q10')">
+      <span class="optletter">C</span><span>Only if the symlink is created by the root/admin user</span>
+    </button>
+    <button class="opt" data-correct="false" onclick="answerQuiz(this, false, 's9-q10')">
+      <span class="optletter">D</span><span>Symlinks can only point to directories, never files</span>
+    </button>
+    </div>
+    <div class="explain"><span class="tag-result"></span>Since a symlink is just a small file containing a path (not a direct inode reference), it can point anywhere the path resolves to — including files on entirely different filesystems or partitions, unlike hard links which are inode-based and filesystem-bound.</div>
+  </div>
+  <div class="quiz-progress"><span class="score" data-correct="0" data-answered="0">0 / 0 correct (0/10 answered)</span></div>
+</div>
+</section>
+
+
+    <footer class="docfoot">Reference notes — Operating Systems core syllabus for placement prep.</footer>
+  </main>
+</div>
+
+<script>
+// Mobile sidebar toggle
+const sidebar = document.getElementById('sidebar');
+const mobileToggle = document.getElementById('mobileToggle');
+const toggleIcon = document.getElementById('toggleIcon');
+if(mobileToggle){
+  mobileToggle.addEventListener('click', function(){
+    sidebar.classList.toggle('open');
+    toggleIcon.textContent = sidebar.classList.contains('open') ? '▴' : '▾';
+  });
+}
+
+// Active nav highlight on scroll
+const navLinks = Array.from(document.querySelectorAll('.navlist a'));
+const sections = navLinks.map(l => document.querySelector(l.getAttribute('href')));
+function onScroll(){
+  let idx = 0;
+  const scrollPos = window.scrollY + 100;
+  sections.forEach((sec, i) => { if(sec && sec.offsetTop <= scrollPos) idx = i; });
+  navLinks.forEach(l => l.classList.remove('active'));
+  if(navLinks[idx]) navLinks[idx].classList.add('active');
+}
+window.addEventListener('scroll', onScroll);
+onScroll();
+
+navLinks.forEach(l => l.addEventListener('click', () => {
+  if(window.innerWidth <= 880){ sidebar.classList.remove('open'); toggleIcon.textContent = '▾'; }
+}));
+
+// ---------- Quiz logic ----------
+function answerQuiz(btn, isCorrect, qcardId){
+  const qcard = document.getElementById(qcardId);
+  if(qcard.dataset.answered === "true") return; // lock after first answer
+  qcard.dataset.answered = "true";
+
+  const opts = qcard.querySelectorAll('.opt');
+  opts.forEach(o => o.classList.add('locked'));
+
+  if(isCorrect){
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('incorrect');
+    // also reveal the correct one
+    const correctBtn = qcard.querySelector('.opt[data-correct="true"]');
+    if(correctBtn) correctBtn.classList.add('correct');
+  }
+  opts.forEach(o => { if(o !== btn && o.dataset.correct !== "true") o.classList.add('dimmed'); });
+
+  const explain = qcard.querySelector('.explain');
+  explain.classList.add('show');
+  explain.classList.add(isCorrect ? 'correct-bg' : 'incorrect-bg');
+  explain.querySelector('.tag-result').textContent = isCorrect ? '✓ Correct' : '✗ Incorrect';
+
+  // update section score
+  const section = qcard.closest('.topic');
+  const scoreEl = section.querySelector('.score');
+  if(scoreEl){
+    let correctCount = parseInt(scoreEl.dataset.correct || "0");
+    let answeredCount = parseInt(scoreEl.dataset.answered || "0");
+    answeredCount += 1;
+    if(isCorrect) correctCount += 1;
+    scoreEl.dataset.correct = correctCount;
+    scoreEl.dataset.answered = answeredCount;
+    const total = section.querySelectorAll('.qcard').length;
+    scoreEl.textContent = correctCount + " / " + answeredCount + " correct (" + answeredCount + "/" + total + " answered)";
+  }
+}
+</script>
+</body>
+</html>
